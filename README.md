@@ -1,6 +1,6 @@
-# Claude plugin marketplace
+# Claude Plugin Marketplace
 
-Private plugin marketplace maintained by Patrick King.
+Plugin marketplace maintained by Patrick King.
 
 ## Plugins
 
