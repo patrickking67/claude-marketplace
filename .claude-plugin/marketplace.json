@@ -9,7 +9,7 @@
       "name": "timekeeper",
       "source": "./timekeeper",
       "description": "Microsoft 365-native legal practice assistant — time reconstruction, polished billing workbooks and memos, billing review, matters, contacts, enterprise search, calendar, and document parsing. Exports import-ready CSVs for Clio Manage and saves polished `.xlsx` workbooks to a working folder you pick. Built for Jalmar Properties, Inc.",
-      "version": "1.10.0",
+      "version": "1.10.1",
       "category": "legal",
       "tags": [
         "legal",
