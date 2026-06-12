@@ -1,6 +1,6 @@
 {
   "name": "Timekeeper",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "Built by Patrick King for Jalmar Properties, Inc. — a Microsoft 365-native legal practice assistant. Timekeeper reconstructs billable time from Outlook, Teams, and calendar; drafts court-defensible entries in the firm's exact format; produces polished billing workbooks and sign-off memos; and helps with matters, contacts, calendar, enterprise search, document parsing, and billing review. It exports an import-ready CSV for Clio Manage and can publish reviewed output to the firm's SharePoint site. Every entry is human-reviewed before it's billed. Works in Claude.ai, Claude Cowork, and Claude Code. Use it to log or reconstruct time, build a billing workbook, find unbilled work, review or reconcile billing, look up a matter or contact, search Microsoft 365, parse invoices or contracts, or get IT support.",
   "author": {
     "name": "Patrick King"

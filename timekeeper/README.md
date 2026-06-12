@@ -8,7 +8,7 @@
 
 ## What it does
 
-You tell Timekeeper *who* and *what dates*; it mines Outlook, Teams, and calendar, maps work to the firm's matters and rate card, drafts court-defensible entries in the firm's exact billing format, shows them for review, and produces an import-ready CSV plus a polished billing workbook (and a sign-off memo at month-end). Around that core it also handles matter and contact lookup, calendar review, enterprise search, document parsing, billing QA, and IT support. A human reviews everything before it's billed.
+You tell Timekeeper *who* and *what dates*; it mines Outlook, Teams, and calendar via Claude's native Microsoft 365 connector, maps work to the firm's matters and rate card, drafts court-defensible entries in the firm's exact billing format, shows them for review, and produces an import-ready CSV plus a polished billing workbook (and a sign-off memo at month-end). Around that core it also handles matter and contact lookup, calendar review, enterprise search, document parsing, billing QA, and IT support. A human reviews everything before it's billed.
 
 ## Skills
 
@@ -38,20 +38,17 @@ Discovery runs on Opus (hardest judgment), routing on Haiku (cheap/frequent), th
 
 ## Connectors
 
-Microsoft 365 (required, read) and SharePoint/OneDrive (optional, write). No Clio or legal-research connectors — see [`CONNECTORS.md`](./CONNECTORS.md).
+Microsoft 365 (required, read — Claude's native connector). Optional: Zoom, Webex, Calendly (Claude built-ins) for extra meeting signal, and SharePoint/OneDrive write for publishing. No Clio or legal-research connectors — see [`CONNECTORS.md`](./CONNECTORS.md).
 
 ## Install
 
-Skills + agents, plus a bundled read-only Microsoft 365 MCP server (`@softeria/ms-365-mcp-server`, started on demand via `npx` — requires Node 18+). No build step.
+Skills + agents only. No bundled MCP, no Node dependency, no build step.
 
+- **Claude Code:** `claude /plugin marketplace add patrickking67/claude-marketplace` then `claude /plugin install timekeeper@DivergeIT`.
 - **Cowork:** open `Timekeeper.plugin`, click **Save plugin**.
-- **Claude Code:** `claude /plugin marketplace add <this folder>` then `claude /plugin install timekeeper@claude-marketplace`.
 - **Claude.ai:** add the skills to your workspace.
 
-Then connect Microsoft 365 (read) — the only requirement:
-
-- **Claude Code:** the bundled `ms365` server runs locally; on first use it prompts a one-time device-code sign-in (run the `login` tool / `/mcp`). It's launched in `--org-mode --read-only`, so it never sends mail or changes anything in M365.
-- **Cowork / Claude.ai:** connect the hosted Microsoft 365 connector instead — the skills are connector-agnostic and use whichever M365 source is present.
+Then connect Claude's **Microsoft 365** connector (read) — the only requirement. Optionally add **Zoom**, **Webex**, or **Calendly** if your firm uses them for meetings or scheduling. Timekeeper reads whichever sources are connected and ignores the rest.
 
 Reviewed output saves to the working folder or, with a write-capable Microsoft connector, publishes to the firm's SharePoint site (see [`CONNECTORS.md`](./CONNECTORS.md)).
 
