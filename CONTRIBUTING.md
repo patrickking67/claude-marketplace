@@ -10,7 +10,7 @@ Thanks for the interest. This marketplace is maintained by Patrick King for **Di
 ## Ground rules
 
 - Every billable entry must remain human-reviewed before it's billed. Don't add code paths that bypass review.
-- Plugin files are read-only after install. Persistent learned state belongs in the user's working folder (`learned-mappings.md`), not in this repo.
+- Plugin files are read-only after install. Persistent learned state belongs in the user's working folder (`Timekeeper.xlsx` — Mappings / Rates / Skips tabs), not in this repo.
 - No bundled MCP servers. Timekeeper relies on Claude's native connectors (Microsoft 365 required; Zoom / Webex / Calendly optional). No SharePoint write — outputs land in a working folder the user chooses.
 - No AI-attribution footers, `Co-Authored-By` trailers, generated-by notices, or bot accounts in commits, PRs, CODEOWNERS, AUTHORS, or package metadata.
 

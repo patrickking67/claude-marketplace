@@ -1,6 +1,6 @@
 # DivergeIT — Claude Plugin Marketplace
 
-Plugin marketplace maintained by Patrick King.
+Plugin marketplace by Patrick King.
 
 ## Plugins
 

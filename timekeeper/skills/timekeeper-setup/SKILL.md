@@ -27,33 +27,24 @@ One question: "Do you use Zoom for client meetings?"
 
 Mention Webex and Calendly only if the user brings them up.
 
-## Step 4 — Pick a working folder
+## Step 4 — Pick a working folder + create the log
 
 Ask the user where Timekeeper should keep its files. Use `AskUserQuestion` with two options:
 - **Use an existing folder** — they paste a path.
 - **Create a new one** — default suggestion: `~/Timekeeper/<Firm-Name>/`.
 
-Save the resolved path as the **working folder**. Everything Timekeeper writes — CSVs for Clio, `.xlsx` workbooks, the `learned-mappings.md` overlay — lives there.
+Save the resolved path as the **working folder**. Everything Timekeeper writes — per-run CSVs for Clio, plus the master log — lives there.
 
-Create `learned-mappings.md` in the working folder if it doesn't exist, using this template:
+Then **create `Timekeeper.xlsx`** in the working folder (the persistent log + knowledge store) with four tabs. Pre-fill what we know; the rest fills in as the user works.
 
-```markdown
-# Learned mappings (Timekeeper)
-Confirmed knowledge that overrides plugin defaults. Edit freely.
-
-## Timekeepers & rates
-| Timekeeper | Default rate | Matter-specific rates / notes |
+| Tab | Purpose | Columns |
 |---|---|---|
-| <name> | <rate> | <matter>: <rate> (e.g., FTC matters × 0.90) |
+| **Entries** | Append-only ledger of every drafted entry — dedup, audit, find-unbilled-time | `RunID`, `Drafted`, `Date`, `BillableUser`, `Matter`, `Description`, `Hours`, `Rate`, `Amount`, `Billable`, `Citation`, `Flag`, `Status` (drafted / reviewed / exported / billed) |
+| **Mappings** | Confirmed contact / entity / property → matter overrides | `Signal` (email / domain / name / property), `Matter`, `ConfirmedDate`, `ConfirmedBy`, `Notes` |
+| **Rates** | Confirmed user × matter rates (overrides the plugin defaults) | `BillableUser`, `Matter`, `Rate`, `EffectiveDate`, `Notes`. Pre-fill the default rate card from the plugin's `matters-and-rates.md`. |
+| **Skips** | Confirmed skip rules — recurring senders / patterns to never bill | `Pattern` (email / domain / subject phrase), `Reason`, `ConfirmedDate` |
 
-## Contact / entity → matter
-| Signal (email, domain, name, property) | Matter (exact) |
-|---|---|
-| <person@firm.com> | <exact matter name> |
-
-## Skip rules (never bill)
-- <recurring internal meeting / newsletter / sender>
-```
+`Timekeeper.xlsx` is the **source of truth for the firm's confirmed knowledge**. The plugin reads it first on every run; per-run CSVs are for Clio import only.
 
 ## Step 5 — Print "what to do next"
 
@@ -64,7 +55,8 @@ Timekeeper is ready.
 
 To draft time:
   "Draft my time for last week"
-  or: "<Name>, <period>"  — e.g. "Patrick King, May 2026" or "everyone, last month"
+  "Log my time today"
+  Then pick a date range and (if needed) confirm the billable user.
 
 To get IT help:
   Say "I need IT help" — prints the DivergeIT Help Desk card.
@@ -72,7 +64,9 @@ To get IT help:
 To search M365:
   Just ask — e.g. "Find the Fikhman deposition notes."
 
-Files save to: <working folder>
+Working folder: <path>
+   ↳ Timekeeper.xlsx       — your log + knowledge store (entries, mappings, rates, skips)
+   ↳ Timekeeper-Entries_*.csv — one per run, for Clio import
 ```
 
 That's the whole setup.

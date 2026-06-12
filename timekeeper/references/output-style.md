@@ -1,84 +1,131 @@
 # Output style
 
-How Timekeeper turns reviewed entries into polished, firm-grade deliverables. The CSV is the machine format for Clio import; the **workbook** and **memo** are the human-facing artifacts. Use the host `xlsx`, `pdf`, and `docx` skills for the mechanics — this file defines the *layout, styling, and naming* so output is consistent and court-facing.
+How Timekeeper turns reviewed entries into clean, firm-grade output. The **CSV** is the machine format for Clio import; the **workbook** is a heavier artifact used only by the `billing` skill at month-end. The default `draft-time-entries` run ends in cards + a Clio-button + the CSV — that's it.
 
 Everything writes to the **working folder** the user chose at setup. No SharePoint publishing.
 
-## Artifacts per run
+## Default run output
 
-| Artifact | Format | Purpose | When |
-|---|---|---|---|
-| Time entries | `.csv` | Clio Manage bulk import — schema per `billing-format.md`. **Never styled.** | Every run |
-| Billing workbook | `.xlsx` | The reviewer's surface and the firm's durable record | Multi-day runs (week+) or on request |
-| Period memo | `.pdf` (or `.docx`) | Sign-off summary for Steve / Sarah | Month-end or on request |
+| Surface | Artifact |
+|---|---|
+| Conversation | Clean entry cards (or Markdown table) + a prominent **Open Clio Manage** button + the CSV path |
+| Working folder | `Timekeeper-Entries_<billable_user>_<start>_<end>.csv` (only) |
 
-A one-off single-entry run (e.g. "log this 0.3 for Laguna") only produces a card + Clio-button — no CSV/workbook needed.
+No `.xlsx`, no memo on a default run. Those only ship from the `billing` skill (month-end workbook / sign-off memo).
 
-## Review surface (the cards)
+## Review surface — the cards
 
-Before any file is written, show the entries for review:
+**Goal:** dense, calm, scannable. Four lines per card, max. The reviewer should know in two seconds whether to approve, edit, or drop it.
 
-- **In Cowork:** clean card stack. One card per entry: date · duration · matter · rate · description · M365 citation · flag (if any).
-- **Elsewhere (Claude.ai / Claude Code):** the same content as a clean Markdown table — never block on a viz tool that isn't there.
+### Card layout
 
-Above the cards, a one-line summary: `N entries · X.X billable hours · $Y · [range]` and the flag count ("3 need your eye"). Flagged entries first.
+```
+┌────────────────────────────────────────────────────────────┐
+│  Mar 3, 2026 · 0.4h · FTC v. American Tax Service · $355.50│   ← header line
+│                                                            │
+│  Review and respond to correspondence from Matt Pham re    │   ← description (the `note`)
+│  discovery requests; draft detailed response.              │
+│                                                            │
+│  ↳  Outlook · "Discovery Production Status" · 11:32 AM PST │   ← citation footnote
+└────────────────────────────────────────────────────────────┘
+```
 
-Below the cards, two actions:
-1. **Open Clio** — a button / link to `https://app.clio.com/nc/#/activities` for entering one or two entries by hand from the New Time Entry form.
-2. **Bulk import** — the path to the CSV (`Timekeeper-Entries_<TK>_<start>_<end>.csv`) for Clio's bulk import.
+- **Header line:** `<date> · <duration>h · <matter> · $<rate>`. Matter shown by exact Clio display name.
+- **Description:** the `note` text exactly as it will appear on the bill — present tense, billing-verb-first, ≤ ~140 chars (wrap if longer).
+- **Citation footnote:** source · subject/title · time. Compact `↳` glyph.
+- **Optional footer chips (only when needed):**
+  - 🟡 **Flag** — short reason ("Unclear matter", "FTC rate confirm", "Thin duration").
+  - **Billable user chip** — only if overridden from the run default.
+  - **Non-billable chip** — only if this row is non-billable.
 
-For Claude.ai / Claude Code, render the button as a plain markdown link.
+### Above the cards
 
-## Billing workbook (.xlsx)
+One line, plain text:
 
-Three tabs:
+```
+N entries · X.X billable hours · $Y · <range> · billable to <user>
+3 need your eye — shown first.
+```
 
-**1. Summary**
-- Title block: firm name (+ logo when available), "Billing Draft — <Timekeeper(s)>", period, generated date, and "DRAFT — for review, not yet billed."
-- **Totals by matter:** Matter · Entries · Hours · Amount — sorted by amount desc.
-- **Totals by timekeeper:** Timekeeper · Hours · Amount.
-- Grand-total row, bold with a top border: entries · hours · $.
-- One-line flag count: "N entries need review — see Flags."
+Flagged entries come first, then chronological.
 
-**2. Detail**
-- Columns in order: Date · Matter · Timekeeper · Description · Hours · Rate · Amount · Billable · Flag.
-- One entry per row (no block-billing). `Amount` = `Rate × Hours` as a formula.
-- Number formats: Hours `0.0`, Rate/Amount `$#,##0.00`, Date `m/d/yyyy`.
-- Freeze the header row; bold + filled header; banded rows; wrap Description; right-align numerics.
-- Tint flagged rows amber so they're scannable.
+### Below the cards — the Clio Manage button
 
-**3. Flags**
-- Only entries needing a decision: Date · Matter · Description · Issue · Suggested fix.
-- Issues mirror the draft flags: unclear matter, multi-matter display name, FTC rate confirm, thin duration, possible duplicate, non-billable candidate.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                Open Clio Manage  →                          │   ← Clio brand blue (#2A4FB9)
+└─────────────────────────────────────────────────────────────┘    background, white bold text
 
-**Styling** — firm palette when brand assets exist (see Branding); otherwise a clean neutral: dark header fill, white bold header text, thin gray gridlines, generous widths, fit-to-width on print. No clip art, no rainbow — restrained and legible.
+Bulk import: <working-folder>/Timekeeper-Entries_<user>_<start>_<end>.csv
+```
 
-## Period memo (.pdf / .docx)
+- **In Cowork:** render as a full-width card-button. Background ≈ Clio brand blue (`#2A4FB9`), text white, bold, ~16–18px, right-arrow glyph. The button is the primary visual weight on the screen — bigger than any single entry card.
+- **In Claude.ai / Claude Code:** render as an emphasized markdown link styled to stand out:
+  ```
+  ### → [Open Clio Manage](https://app.clio.com/nc/#/activities)
+  ```
+  Then the small `Bulk import: <path>` line under it.
 
-One page:
-- Letterhead (logo / firm block) or a clean header.
-- "Billing Summary — <period>", timekeeper(s).
-- Totals-by-matter table + grand total.
-- Flags called out (count + the few that matter).
-- Sign-off line: `Reviewed & approved: __________   Date: ______`.
-- Footer: generated date, "Draft — entries import to Clio on approval."
+The button always links to `https://app.clio.com/nc/#/activities` — Clio's New Time Entry page.
 
-Use `pdf` for a fixed sign-off PDF; `docx` if they want to edit before sending.
+### Per-entry inline edits
+
+Editable in place (no separate form):
+- Billable user (dropdown from rate card)
+- Billable / non-billable (toggle)
+- Description (free text)
+- Duration (decimal hours)
+
+Matter and rate are inferred from the work + rate card — if the user wants to change them, they pick from the matter dropdown and the rate auto-updates.
+
+## CSV (Clio bulk import)
+
+Schema, encoding, and verification rules live in `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md`. Filename:
+
+```
+Timekeeper-Entries_<billable_user>_<start>_<end>.csv
+```
+
+`<billable_user>` = the picked user's short name (e.g. `Sarah-Bates`).
+
+- **Never overwrite** an existing file — version with `_vN` and tell the user.
+- Never modify the firm's source files.
+
+## The master log + knowledge store — `Timekeeper.xlsx`
+
+Created by `timekeeper-setup` in the working folder. **One xlsx, four tabs, append-only.** Every run reads it first (defaults overridden) and appends to it (entries + confirmed learnings). It's the firm's durable record outside Clio.
+
+### Tabs
+
+**`Entries`** — append-only ledger of every drafted entry.
+Columns: `RunID` · `Drafted` · `Date` · `BillableUser` · `Matter` · `Description` · `Hours` · `Rate` · `Amount` · `Billable` · `Citation` · `Flag` · `Status` (`drafted` / `reviewed` / `exported` / `billed`).
+Formula `Amount = Rate × Hours`. Hours `0.0`, money `$#,##0.00`, date `m/d/yyyy`. Frozen header, banded rows, wrap Description, right-align numerics. Amber-tint flagged rows.
+
+**`Mappings`** — confirmed contact / entity / property → matter overrides.
+Columns: `Signal` · `Matter` · `ConfirmedDate` · `ConfirmedBy` · `Notes`.
+
+**`Rates`** — confirmed user × matter rates. Overrides the plugin's default rate card.
+Columns: `BillableUser` · `Matter` · `Rate` · `EffectiveDate` · `Notes`.
+Setup pre-fills this from the plugin's `matters-and-rates.md` so the user can see / edit defaults.
+
+**`Skips`** — confirmed recurring senders / patterns to never bill.
+Columns: `Pattern` · `Reason` · `ConfirmedDate`.
+
+### Rules
+
+- **Never overwrite** — append rows; preserve the user's manual edits.
+- **Never write speculative knowledge** — only what the user confirmed in the current run.
+- **Read first, write last** — every skill reads the workbook before drafting; writes happen after user approval.
+
+### Optional sub-products (only on explicit request from the `billing` skill)
+
+- **Summary view** — a temporary sheet `Summary_<period>` summarizing totals by matter / by user for a period; users export to PDF for sign-off.
+- **Period memo** — `Billing-Memo_<period>.pdf` for month-end (letterhead, totals, flags, sign-off line).
+
+Default `draft-time-entries` runs only append to `Entries` (plus any confirmed Mappings / Rates / Skips). No new files, no summary sheet, no memo unless asked.
+
 
 ## Branding
 
 - Drop a firm logo at `<working folder>/branding/`. The workbook title block and memo letterhead use it when present.
-- **No Jalmar Properties mark yet** → default to the neutral professional style.
-
-## File naming
-
-All saved to the chosen working folder.
-
-- `Timekeeper-Entries_<TK>_<start>_<end>.csv`
-- `Billing-Workbook_<TK>_<period>.xlsx`
-- `Billing-Memo_<period>.pdf`
-
-`<TK>` = timekeeper short name or `AllTimekeepers`; `<period>` like `2026-03`.
-
-- **Never overwrite** an existing file — version with a `_vN` suffix and tell the user.
-- Never modify the firm's original / source files — produce new outputs.
+- Cards stay neutral — no logo on the review surface.
