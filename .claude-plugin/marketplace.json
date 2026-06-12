@@ -1,0 +1,26 @@
+{
+  "name": "DivergeIT",
+  "owner": {
+    "name": "Patrick King",
+    "url": "https://github.com/patrickking67"
+  },
+  "plugins": [
+    {
+      "name": "timekeeper",
+      "source": "./timekeeper",
+      "description": "Microsoft 365-native legal practice assistant — time reconstruction, polished billing workbooks and memos, billing review, matters, contacts, enterprise search, calendar, and document parsing. Exports import-ready CSVs for Clio Manage and publishes reviewed output to SharePoint. Built by DivergeIT for FedReceiver, Inc.",
+      "version": "1.6.1",
+      "category": "legal",
+      "tags": [
+        "legal",
+        "billing",
+        "time-entry",
+        "receivership",
+        "microsoft-365",
+        "practice-management",
+        "clio",
+        "sharepoint"
+      ]
+    }
+  ]
+}
