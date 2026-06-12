@@ -23,7 +23,6 @@ You tell Timekeeper *who* and *what dates*; it mines Outlook (Inbox / Sent / Del
 | `documents` | Parse and validate xlsx, csv, docx, pptx, pdf — and produce them |
 | `timekeeper-setup` | Five-minute first-run: confirm install, M365 check, optional Zoom, pick a folder, done |
 | `billing-best-practices` | Defensible-billing + § 330 + legal-AI ethics (ABA 512) + company-data governance |
-| `help-desk` | Prints the DivergeIT Help Desk card (phone / email / portal) for any IT request |
 
 ## Agents
 
@@ -68,9 +67,9 @@ From the review surface, click **Open Clio** (`https://app.clio.com/nc/#/activit
 
 Plugin files are read-only after install, so Timekeeper keeps `Timekeeper.xlsx` in your working folder — every drafted entry, plus confirmed contact→matter mappings, per-user rates, and skip rules accumulate across its tabs. `timekeeper-setup` creates it; every run reads it first and appends to it.
 
-## Company data & support
+## Company data
 
-Timekeeper follows the firm's data-handling rules (see `billing-best-practices`): high-sensitivity defaults, describe-the-work-not-the-content for privilege, no model training on firm data, and escalation paths. For any IT issue — password reset, MFA, Keeper access, account locked — invoke `help-desk`.
+Timekeeper follows the firm's data-handling rules (see `billing-best-practices`): high-sensitivity defaults, describe-the-work-not-the-content for privilege, no model training on firm data, and escalation paths.
 
 ## License
 

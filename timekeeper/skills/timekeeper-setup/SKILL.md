@@ -58,9 +58,6 @@ To draft time:
   "Log my time today"
   Then pick a date range and (if needed) confirm the billable user.
 
-To get IT help:
-  Say "I need IT help" — prints the DivergeIT Help Desk card.
-
 To search M365:
   Just ask — e.g. "Find the Fikhman deposition notes."
 
