@@ -1,6 +1,6 @@
 ---
 name: draft-time-entries
-description: The main Timekeeper workflow — reconstruct billable time from Microsoft 365 (and optional Zoom / Webex / Calendly) by asking only date range, the billable user (dropdown), and notes; then runs a full M365 sweep, shows review-ready cards, and writes a Clio-import CSV (plus an .xlsx workbook for week-scale runs) to the working folder. Use whenever someone says "log my time," "bill my week," "draft time entries," "reconstruct my hours," "find unbilled time," "what should I bill," "I forgot to track my time," or names a period for billing. Runs interactively — every entry is a draft for human review, never auto-billed.
+description: The main Timekeeper workflow — reconstruct billable time from Microsoft 365 (and optional Zoom / Webex / Calendly). One mini-questionnaire card (date range, billable user, matters, billable-or-not, notes, optional file upload), then a full M365 sweep, review-ready cards with a big Open-Clio-Manage button, and a per-run Clio-import CSV written to the working folder. Use whenever someone says "log my time," "bill my week," "draft time entries," "reconstruct my hours," "find unbilled time," "what should I bill," "I forgot to track my time," or names a period for billing. Every entry is a draft for human review — never auto-billed.
 ---
 
 # Draft time entries
@@ -9,34 +9,63 @@ Reconstruct billable time from Microsoft 365 and produce review-ready entries in
 
 Read these before drafting: `${CLAUDE_PLUGIN_ROOT}/references/m365-mining.md`, `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md`, `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`, `${CLAUDE_PLUGIN_ROOT}/references/non-billable.md`. Then load `<working folder>/Timekeeper.xlsx` — its `Mappings`, `Rates`, and `Skips` tabs override plugin defaults; its `Entries` tab is the dedup source.
 
-## Step 1 — Date range
+## Step 1 — The questionnaire (one card, five fields)
 
-Show a single card / `AskUserQuestion`:
+Before any prompting, auto-detect the current M365 user (the connector exposes the signed-in user — pull email / display name). Match that email against the timekeeper card in `matters-and-rates.md`; load `<working folder>/Timekeeper.xlsx` Rates tab for any per-user overrides. That's the default billable user.
 
-> **What date range?**
-> - Today
-> - This week
-> - Last week
-> - Last month
-> - Custom (text input)
+Then show **one card** with five fields and a single submit button. The user fills what they want and accepts the defaults for the rest.
 
-Resolve to ISO start / end dates in **Pacific time** (the firm's local TZ — see Step 3). Read back one line: *"Sweeping March 2 → March 6, 2026 (last week, Pacific)."*
+```
+┌──────────────────────────────────────────────────────┐
+│  Draft time entries                                  │
+│                                                      │
+│  1. Date range                                       │
+│     ◉ Last week     ○ Today      ○ This week         │
+│     ○ Last month    ○ Custom: [_______________]      │
+│                                                      │
+│  2. Billable to                                      │
+│     [ <auto-detected user>                  ▼ ]      │
+│       (dropdown: all timekeepers on the rate card)   │
+│                                                      │
+│  3. Matters                                          │
+│     ◉ All matters                                    │
+│     ○ Specific: [_____________________________]      │
+│                                                      │
+│  4. Billable                                         │
+│     ◉ Billable    ○ Non-billable                     │
+│                                                      │
+│  5. Notes (optional)                                 │
+│     [ Anything to skip, focus on, or override —   ]  │
+│     [ e.g. "ignore standups", "thread on Fikhman" ]  │
+│                                                      │
+│  📎 Attach (optional)                                │
+│     Clio activities export, ICS calendar, an         │
+│     invoice you're reconciling against, anything.    │
+│                                                      │
+│           ┌──────────────────────┐                   │
+│           │  Run sweep   →       │                   │
+│           └──────────────────────┘                   │
+└──────────────────────────────────────────────────────┘
+```
 
-## Step 2 — Billable user + matters/notes
+**In Cowork:** render exactly as a five-field card with the submit button. Editable inline, single submit.
 
-Auto-detect the current M365 user (the M365 connector exposes the signed-in user — pull email / display name). Match that email against the timekeeper card in `matters-and-rates.md`; that's the default billable user.
+**In Claude.ai / Claude Code:** the surface doesn't render rich forms, so present the questionnaire as one prompt with the defaults filled in:
 
-Then show one card / `AskUserQuestion` with three fields:
-
-> **Whose time, and any notes?**
+> Draft time entries — defaults below. Reply with overrides or just "go".
 >
-> - **Billable user** — dropdown of every timekeeper on the rate card. Default = auto-detected current user. (Used as the `activity_user` in Clio — change this when logging on behalf of someone else, e.g. the EVM Martin rule where the team bills as Steve Donell.)
-> - **Default billable status** — Billable (default) / Non-billable. Per-entry overrides happen in review.
-> - **Matters + notes** — free text. Examples: "all matters", "just FTC", "Laguna only, ignore standups", "everything except internal admin". Treat as authoritative hints; if a note conflicts with what you find, flag rather than silently override.
+> 1. Date range: **last week** (`<start>` → `<end>`, Pacific)
+> 2. Billable to: **`<auto-detected user>`**
+> 3. Matters: **all**
+> 4. Billable / non-billable: **billable**
+> 5. Notes: (none)
+> 📎 Attach anything? (paste a file or skip)
 
-If the auto-detected email isn't on the rate card, the dropdown still shows the full list — pick "I'll set this" and tell the user.
+If the user replies "go" or similar, use the defaults. If they reply with overrides ("last week, just FTC, skip standups"), parse and merge into the defaults. Don't ask follow-up questions — one shot.
 
-## Step 3 — Big research (delegate to `activity-miner`)
+Resolve the date range to ISO start / end in **Pacific time** (see Step 2). If "Custom" was picked without a value, that's the only thing worth following up on.
+
+## Step 2 — Big research (delegate to `activity-miner`)
 
 Hand `{billable_user, range, scope, notes, default_billable}` to **activity-miner**. It runs the full sweep across every connected source in parallel — don't do it inline.
 
@@ -67,7 +96,7 @@ For every billing date range, search **all** of the following — don't skip any
 - `sender` + `folderName`: **not supported**.
 - Pagination: `offset` for folder+date; `cursor` for free-text `query`.
 
-## Step 4 — Zero-results fallback
+## Step 3 — Zero-results fallback
 
 If the full sweep returns **no candidates**, don't give up. Print:
 
@@ -80,7 +109,7 @@ If the full sweep returns **no candidates**, don't give up. Print:
 
 Don't return an empty CSV. Either widen the search, switch identity, manually capture, or stop with a clear "nothing to bill."
 
-## Step 5 — Draft (delegate to `entry-drafter`)
+## Step 4 — Draft (delegate to `entry-drafter`)
 
 Pass candidates + `{billable_user, default_billable, notes}` to **entry-drafter**. Apply, in this order:
 
@@ -89,13 +118,13 @@ Pass candidates + `{billable_user, default_billable, notes}` to **entry-drafter*
 3. **No block billing** — each distinct issue or task gets its own line. "; and" or different topics in one entry → split.
 4. **Per-case policy** — Fikhman conservative; Laguna bill everything; Beloit selective; EVM Martin bills as Steve Donell regardless of who did the work. See `matters-and-rates.md`.
 5. **Billable user** — set `activity_user = <picked billable_user>` on every entry. The per-matter rate (`price`) follows that user × matter.
-6. **Billable / non-billable** — default per Step 2's toggle. The drafter still flips entries to `non_billable = true` when they're administrative or fail § 330 (e.g. a tracked internal-IT email that surfaced).
+6. **Billable / non-billable** — default per the Step 1 questionnaire's toggle. The drafter still flips entries to `non_billable = true` when they're administrative or fail § 330 (e.g. a tracked internal-IT email that surfaced).
 7. **Honest time estimates** — never pad to hit a daily target, never trim below reality. Email volume alone doesn't drive duration. Total daily hours fall where honest per-task estimates land.
 8. **Round UP to the next tenth** — 1–6 min = 0.1, 7–12 = 0.2, … Minimum 0.1.
 9. **Description voice** — present-tense billing verb first (Review, Draft, Coordinate, Correspond, Prepare, Discuss, Attend, etc.); name people by full name; specific; no privileged substance; no filler ("briefly", "quickly", "worked on").
 10. **Matter assignment** — confirmed mapping → property/entity/party reference → counterparty domain → thread continuity. **Rates file is authoritative — never invent a matter name.** Sender identity alone is never sufficient (Brian Landau, Ori Blumenfeld, Peggy Lennon span matters).
 
-## Step 6 — Review surface (clean cards + big Clio Manage button)
+## Step 5 — Review surface (clean cards + big Clio Manage button)
 
 Show the drafted entries for review before anything leaves. Keep the cards calm and dense — see `${CLAUDE_PLUGIN_ROOT}/references/output-style.md` for the exact layout.
 
@@ -121,7 +150,7 @@ In Cowork: render as a card-button, full-width, Clio brand blue background, whit
 
 Per-entry edits (billable user / billable-or-not) happen inline on the card — don't open separate forms.
 
-## Step 7 — Write the CSV (to the working folder)
+## Step 6 — Write the CSV (to the working folder)
 
 The end output is **just the CSV**. To the user's chosen working folder, write:
 
@@ -148,7 +177,7 @@ matter,date,activity_description,note,price,quantity,type,activity_user,non_bill
 - `price` — hourly rate (no `$`).
 - `quantity` — decimal hours (e.g. `0.3`).
 - `type` — **blank** (= TimeEntry).
-- `activity_user` — the billable user picked in Step 2 (e.g. `Sarah Bates`). Same on every row in the run (unless an entry was overridden in review).
+- `activity_user` — the billable user picked in Step 1 (e.g. `Sarah Bates`). Same on every row in the run (unless an entry was overridden in review).
 - `non_billable` — `false` (or blank) for billable; `true` for recorded-but-not-charged.
 
 ### CSV encoding (prevents column drift on Clio import)
@@ -158,7 +187,7 @@ matter,date,activity_description,note,price,quantity,type,activity_user,non_bill
 - **Plain ASCII punctuation** — convert em dashes (`—` → ` - `), curly quotes, multi-byte chars.
 - **Verify before delivering:** every row has exactly **9 columns**, and columns C (`activity_description`) and G (`type`) are blank.
 
-## Step 8 — Hand off
+## Step 7 — Hand off
 
 Print:
 - One-line summary (entries · hours · $ · range · billable user).
@@ -167,7 +196,7 @@ Print:
 
 Close with: *"Ready to review and import into Clio."*
 
-## Step 9 — Update the log + knowledge store (the plugin learns)
+## Step 8 — Update the log + knowledge store (the plugin learns)
 
 After the user approves and the CSV is written, **append to `<working folder>/Timekeeper.xlsx`** — the single store created at setup. The plugin's knowledge improves run over run from confirmed corrections; never silently, always from explicit user confirmation.
 
@@ -190,7 +219,7 @@ The miner, drafter, and auditor all load `Timekeeper.xlsx` first on the next run
 ## Guardrails
 
 - Never invent activity, durations, or matter names. Missing signal → conservative estimate + flag.
-- Never auto-bill. The review at Step 6 is the point.
+- Never auto-bill. The review at Step 5 is the point.
 - Don't quote privileged content in descriptions — describe the work, not the substance.
 - Don't anchor totals to a daily target (e.g. 8 hours). Hours fall where honest per-task estimates land.
 - Don't ask for the timekeeper's name — auto-detect, then show the dropdown.
