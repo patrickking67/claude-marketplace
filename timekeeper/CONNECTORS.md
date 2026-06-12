@@ -22,7 +22,7 @@ All optional. Connect what your firm uses; Timekeeper picks up whichever sources
 
 ## Output destination
 
-You pick a **working folder** at setup (existing or new). Everything Timekeeper produces — CSV for Clio, polished `.xlsx` workbook, the `learned-mappings.md` overlay — lives there. No SharePoint publishing, no auto-uploads.
+You pick a **working folder** at setup (existing or new). Everything Timekeeper produces — per-run CSVs for Clio plus the master `Timekeeper.xlsx` log + knowledge store (Entries / Mappings / Rates / Skips tabs) — lives there. No SharePoint publishing, no auto-uploads.
 
 ## Surfaces
 

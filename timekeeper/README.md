@@ -60,13 +60,13 @@ Everything writes to a **working folder** you pick during `timekeeper-setup` (ex
 - `Timekeeper-Entries_<TK>_<start>_<end>.csv` — Clio bulk import.
 - `Billing-Workbook_<TK>_<period>.xlsx` — reviewer's workbook (Summary / Detail / Flags tabs).
 - `Billing-Memo_<period>.pdf` — month-end sign-off summary (on request).
-- `learned-mappings.md` — your overlay of confirmed contact→matter mappings, rates, and skip rules.
+- `Timekeeper.xlsx` — your persistent log + knowledge store (Entries / Mappings / Rates / Skips tabs); created at setup and appended to on every run.
 
 From the review surface, click **Open Clio** (`https://app.clio.com/nc/#/activities`) for one-off entries, or bulk-import the CSV.
 
 ## How it learns
 
-Plugin files are read-only after install, so Timekeeper keeps `learned-mappings.md` in your working folder — confirmed contact→matter mappings, timekeeper rates, and skip rules accumulate there. `timekeeper-setup` creates it.
+Plugin files are read-only after install, so Timekeeper keeps `Timekeeper.xlsx` in your working folder — every drafted entry, plus confirmed contact→matter mappings, per-user rates, and skip rules accumulate across its tabs. `timekeeper-setup` creates it; every run reads it first and appends to it.
 
 ## Company data & support
 

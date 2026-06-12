@@ -5,7 +5,7 @@ description: Find and confirm the right matter for a piece of work from the firm
 
 # Matters
 
-Get the matter right — a misposted matter is a misbilled client. The **rate model and mapping rules** live in `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`; the **current matter list** comes from the firm's Clio matters export (provided at run time) or the working folder's `learned-mappings.md` (apply confirmed overrides first).
+Get the matter right — a misposted matter is a misbilled client. The **rate model and mapping rules** live in `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`; the **current matter list** comes from the firm's Clio matters export (provided at run time) or the working folder's `Timekeeper.xlsx` Mappings tab (apply confirmed overrides first).
 
 ## Use it to
 
@@ -16,7 +16,7 @@ Get the matter right — a misposted matter is a misbilled client. The **rate mo
 ## Rules
 
 - Use **exact display names** — a near-miss can mispost or fail import. Watch for stray near-duplicates (e.g., "Pine Hallow" vs "Pine Hollow Receivership Estate").
-- **Never invent a matter.** If activity points to something not on the current matter list, say so and ask — then record the confirmed mapping in `learned-mappings.md`.
+- **Never invent a matter.** If activity points to something not on the current matter list, say so and ask — then record the confirmed mapping in `Timekeeper.xlsx` (Mappings tab).
 - Non-client contacts (outside counsel, insurers, vendors) are **not** matters — never bill to them.
 - When two matters are plausible, pick the higher-confidence one and **flag** the alternative.
 

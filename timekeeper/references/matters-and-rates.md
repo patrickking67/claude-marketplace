@@ -1,6 +1,6 @@
 # Matters and rates
 
-This file carries the firm's **rate model and billing methodology** — the stable knowledge. The **current matter list** (names, sub-matters, open/closed) is **not** frozen here: load it from the firm's Clio matters export at run time, or accrue confirmations in `learned-mappings.md`. **Clio is the firm's system of record** — treat everything here as a strong prior and confirm anything uncertain.
+This file carries the firm's **rate model and billing methodology** — the stable knowledge. The **current matter list** (names, sub-matters, open/closed) is **not** frozen here: load it from the firm's Clio matters export at run time, or accrue confirmations in `Timekeeper.xlsx` (Mappings tab). **Clio is the firm's system of record** — treat everything here as a strong prior and confirm anything uncertain.
 
 Firm: **FedReceiver, Inc.** — Steve Donell is responsible/originating attorney (and receiver) on essentially every matter; most share the asset-manager address, 12121 Wilshire Blvd., Ste. 710, Los Angeles, CA 90025.
 
@@ -23,7 +23,7 @@ Rates are **per timekeeper**, not per matter — the same matter shows multiple 
 | Dora Orgill | dora.orgill@fedreceiver.com | Non-attorney | — (does not bill time) |
 | General Administrative | lisa.qin@jalmar.com | — | $148.50 |
 
-These are **firm default rates**. The actual rate resolves **user → matter → firm**, so a matter-specific override wins — see the per-matter base/alternate rates below. Rates also vary **per user per matter**: e.g., Steve Donell bills $495 on Laguna but ~$450 on Beloit (per the May productivity report). When a specific user×matter rate isn't certain, **flag** rather than guess. Capture confirmed corrections in `learned-mappings.md` (it overrides this card).
+These are **firm default rates**. The actual rate resolves **user → matter → firm**, so a matter-specific override wins — see the per-matter base/alternate rates below. Rates also vary **per user per matter**: e.g., Steve Donell bills $495 on Laguna but ~$450 on Beloit (per the May productivity report). When a specific user×matter rate isn't certain, **flag** rather than guess. Capture confirmed corrections in `Timekeeper.xlsx` (Rates tab) — it overrides this card.
 
 **Rate rules & gotchas:**
 - **FTC matters run at standard × 0.90** (court-supervised). On `FTC v. American Tax Service, et al.`: Sarah $395 → $355.50, the $275 tier → $247.50. Apply and **flag for confirmation**.
@@ -56,7 +56,7 @@ Each case bills differently — apply the case's policy, never a uniform rule:
 | **Beloit Receivership Estate** | **Only certain task types are billable** — don't bill the whole day; include only what the firm bills here and flag the rest. |
 | **EVM Martin** (= `Martin Apartments, LLC`) | **Steve Donell is the sole biller.** The team performs the work and bills **on Steve's behalf** — set `activity_user = Steve Donell` regardless of who did it. |
 
-When a case isn't listed, bill honestly per the § 330 test and the no-block rule. Record new per-case policies in `learned-mappings.md` as they're confirmed.
+When a case isn't listed, bill honestly per the § 330 test and the no-block rule. Record new per-case policies in `Timekeeper.xlsx` (Rates / Mappings tabs, with a `Notes` cell) as they're confirmed.
 
 ### Matter names — working shorthand vs. Clio display name
 
@@ -99,7 +99,7 @@ The authoritative, current matter list — exact display names, sub-matters, and
 ## Mapping activity → matter
 
 Signals, strongest first:
-1. **Confirmed mapping** in `learned-mappings.md`.
+1. **Confirmed mapping** in `Timekeeper.xlsx` (Mappings tab).
 2. **Property / entity / party name** in the subject, body, or attendees — matters are named for properties, estates, or cases (FTC v. …, Youssif v. …).
 3. **Counterparty email domain** or recurring contact.
 4. **Thread continuity** — a reply belongs to its parent's matter.

@@ -5,7 +5,7 @@ description: The firm's billing workflow — QA drafted time entries, reconcile 
 
 # Billing
 
-Everything between "drafted" and "billed." A bad import is painful to unwind and a misposted or duplicated entry becomes a client fee-objection, so this skill is the gate. Reference `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md` and `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`; honor `learned-mappings.md`.
+Everything between "drafted" and "billed." A bad import is painful to unwind and a misposted or duplicated entry becomes a client fee-objection, so this skill is the gate. Reference `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md` and `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`; honor `<working folder>/Timekeeper.xlsx` (Rates / Mappings / Skips tabs override defaults; the Entries tab is the cross-run ledger for dedup and unbilled-time gaps).
 
 All outputs land in the **working folder** the user chose at setup. No SharePoint publishing.
 
@@ -15,7 +15,7 @@ All outputs land in the **working folder** the user chose at setup. No SharePoin
 
 **Reconcile against an invoice** — given a monthly invoice (PDF / xlsx), have `billing-auditor` match drafts to billed line items; report billed-but-not-drafted and drafted-but-not-billed.
 
-**Find unbilled time** — load the firm's activities export CSV from the working folder (or have the user upload it) to identify existing billed hours per day. Flag all days with < 5.0 existing billed hours as target days. Run `activity-miner` over those days; cross-check candidates against existing entries and prior Claude sessions (`conversation_search`) to avoid duplicates. Lead with total recoverable dollars (`rate × hours`) — that's the headline.
+**Find unbilled time** — read `Timekeeper.xlsx` (Entries tab) to get every drafted entry across runs; identify existing billed hours per day. Flag all days with < 5.0 existing billed hours as target days. Run `activity-miner` over those days; cross-check candidates against the Entries tab (and prior Claude sessions via `conversation_search`) to avoid duplicates. Lead with total recoverable dollars (`rate × hours`) — that's the headline. If the firm has a Clio activities export CSV, ingest it into the Entries tab first as billed-elsewhere rows.
 
 **Month-end cycle** — orchestrate across timekeepers with approval gates: draft each (via `draft-time-entries`) → ⛔ review → audit the combined set (incl. cross-timekeeper duplicates) → reconcile / gap-check → ⛔ approve → save the deliverables to the working folder + a short memo with totals by matter and timekeeper. The gates are the feature; never collapse them.
 
