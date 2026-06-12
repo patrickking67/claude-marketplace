@@ -1,5 +1,8 @@
 {
   "name": "DivergeIT",
+  "metadata": {
+    "description": "DivergeIT's Claude plugins for our clients"
+  },
   "owner": {
     "name": "Patrick King",
     "url": "https://github.com/patrickking67"
