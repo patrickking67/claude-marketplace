@@ -1,8 +1,38 @@
 # Output style
 
-How Timekeeper turns reviewed entries into clean, firm-grade output. The **CSV** is the machine format for Clio import; the **workbook** is a heavier artifact used only by the `billing` skill at month-end. The default `draft-time-entries` run ends in cards + a Clio-button + the CSV — that's it.
+How Timekeeper turns reviewed entries into clean, firm-grade output. The **CSV** is the machine format for Clio import; the **workbook** is a heavier artifact used only by the `billing` skill at month-end. The default `draft-time-entries` run is one questionnaire card → one sweep → review cards + Clio-button + the CSV — that's it.
 
 Everything writes to the **working folder** the user chose at setup. No SharePoint publishing.
+
+## The questionnaire card (the one prompt)
+
+The single intake at the top of a `draft-time-entries` run. Five fields + an optional upload + one submit button. **Defaults visible and editable** — the user can submit without changing anything.
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Draft time entries                                  │
+│                                                      │
+│  1. Date range                                       │
+│     ◉ Last week   ○ Today   ○ This week              │
+│     ○ Last month  ○ Custom: [______________]         │
+│                                                      │
+│  2. Billable to       [ <auto-user>         ▼ ]      │
+│  3. Matters           ◉ All   ○ Specific: [____]     │
+│  4. Billable          ◉ Billable  ○ Non-billable     │
+│  5. Notes (opt)       [____________________________] │
+│                                                      │
+│  📎 Attach (opt) — Clio export, ICS, invoice, etc.   │
+│                                                      │
+│           ┌──────────────────────┐                   │
+│           │  Run sweep   →       │                   │
+│           └──────────────────────┘                   │
+└──────────────────────────────────────────────────────┘
+```
+
+- **Width:** card-width, single column.
+- **Submit button:** Clio-blue-adjacent or firm-neutral primary color — but smaller than the post-review *Open Clio Manage* button (that one is the visual climax of the run, this is just the kickoff).
+- **No "Cancel"** — closing the card cancels.
+- **Outside Cowork:** render as a single defaults-filled prompt; accept "go" to use defaults, or parsed overrides in one reply. Don't drip-ask.
 
 ## Default run output
 
