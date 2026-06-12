@@ -1,62 +1,133 @@
 ---
 name: draft-time-entries
-description: The main Timekeeper workflow — reconstruct billable time from Microsoft 365 through a guided interview. Use whenever someone says "log my time," "bill my week," "draft time entries," "reconstruct my hours," "what should I bill," "I forgot to track my time," "turn my email and calendar into time entries," or names a timekeeper and a date range for billing. Runs interactively — it asks who and what dates, confirms, mines Outlook/Teams/calendar, shows reviewable cards, and writes an import-ready CSV. Never auto-bills — every entry is a draft for human review.
+description: The main Timekeeper workflow — reconstruct billable time from Microsoft 365 (and optional Zoom / Webex / Calendly) through a guided interview, produce review-ready cards, and write a Clio-import CSV (plus an .xlsx workbook for week-scale runs) to the working folder. Use whenever someone says "log my time," "bill my week," "draft time entries," "reconstruct my hours," "find unbilled time," "what should I bill," "I forgot to track my time," or names a timekeeper and a date range for billing. Runs interactively — every entry is a draft for human review, never auto-billed.
 ---
 
 # Draft time entries
 
-Reconstruct a timekeeper's billable day from Microsoft 365 and produce review-ready entries in the firm's format. This is an **interactive** workflow: interview first, confirm, then work. Accuracy and defensibility beat speed — every entry has to survive a court fee-audit, so when in doubt, flag rather than guess.
+Reconstruct a timekeeper's billable day from Microsoft 365 and produce review-ready entries in the firm's exact format. This is an **interactive** workflow: small card up front, big research underneath, clean review surface at the end. Accuracy and defensibility beat speed — every entry has to survive a court fee-audit, so when in doubt, flag rather than guess.
 
-Read these before drafting: `${CLAUDE_PLUGIN_ROOT}/references/m365-mining.md`, `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md`, `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`. Apply the working folder's `learned-mappings.md` if it exists.
+Read these before drafting: `${CLAUDE_PLUGIN_ROOT}/references/m365-mining.md`, `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md`, `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`, `${CLAUDE_PLUGIN_ROOT}/references/non-billable.md`. Apply the working folder's `learned-mappings.md` if it exists.
 
-## Step 1 — Interview (don't skip)
+## Step 1 — The entry card
 
-Ask the user, using a single `AskUserQuestion` round where possible:
+Show a single card asking: **"Which timekeeper(s) and period?"** — placeholder: `e.g. Patrick King, May 2026 — or "everyone, last month"`.
 
-1. **Timekeeper** — whose time are we drafting? (default: the connected M365 user)
-2. **Date range** — Yesterday / This week / Last week / Last 7 days / Custom. Resolve relative ranges to ISO dates using today's date and read them back.
-3. **Matter scope** — all matters, or focus/exclude specific ones?
-4. **Notes** (free text, optional) — meetings or people to exclude, a matter the whole day belongs to, a rate override, "ignore anything before 10am," etc. Treat these as authoritative hints; if a note conflicts with what you find, flag the conflict rather than silently overriding.
-5. **Output** — CSV only, or CSV + publish to SharePoint.
+In Cowork render as a card; in Claude.ai / Claude Code use `AskUserQuestion` (single text input). If the user already named a timekeeper and a range in their message, skip the card and confirm.
 
-If the user already gave a concrete range in their message, skip straight to confirmation.
+Resolve relative ranges to ISO dates against today's date.
 
-## Step 2 — Confirm
+## Step 2 — Quick confirm
 
-Read back the resolved parameters in one line ("Drafting Sarah's time, 2026-03-02→03-06, all matters, excluding internal standups, CSV only — go?") and wait for a yes. This is the cheap moment to catch a wrong name or window.
+Read back one line and wait for a yes: *"Drafting Sarah's time, 2026-03-02 → 03-06, all matters — go?"*. If the user replied to the entry card with everything (timekeeper + range + scope), this is the only confirmation needed.
 
-## Step 3 — Discover (delegate to `activity-miner`, Opus)
+## Step 3 — The big research (delegate to `activity-miner`)
 
-Hand the timekeeper + range + scope to the **activity-miner** agent. It sweeps Outlook sent/received, Teams, calendar, and SharePoint and returns cited candidates with matter guesses, duration estimates, and confidence. Don't do this sweep inline — the agent is tuned for it and runs on Opus for the hard mapping calls.
+Hand timekeeper + range + scope to the **activity-miner** agent. It runs the full sweep across every connected source in parallel — don't do it inline.
 
-## Step 4 — Draft (delegate to `entry-drafter`, Sonnet)
+### Mandatory: Pacific-time day boundaries
 
-Pass the candidates to the **entry-drafter** agent to set matters + per-timekeeper rates, write descriptions in the firm voice, round to tenths, and emit rows in the exact CSV schema plus a flag list.
+The firm works in **Pacific time**. Every "day" search must cover a full **Pacific day**. A UTC-midnight window drops evening work and silently omits billable items — the #1 cause of "missing" time.
 
-## Step 5 — Review (cards or table)
+- **Preferred — local boundaries:** `afterDateTime: "<Month Day Year> 12:00am"` / `beforeDateTime: "<Month Day Year> 11:59pm"`. Natural-language local handles DST automatically.
+- **Manual UTC:** PDT (≈Mar–Nov, UTC−7) → target day `07:00Z` to next day `07:00Z`; PST (≈Nov–Mar, UTC−8) → `08:00Z` to `08:00Z`.
 
-Show the drafted entries for review before anything leaves. **In Cowork**, render a clean card stack with `mcp__visualize__show_widget`; **in Claude.ai or Claude Code**, present the same content as a clean Markdown table — never block on a visualization tool that isn't there. Per entry, show: date, duration, matter, rate, the description (the billable `note`), the M365 citation, and any flag with its reason. Put flagged entries first, and offer **Copy all** plus the CSV. Keep it a calm review surface, not a dashboard.
+### Mandatory: all sources searched
 
-Above the cards, give a one-line summary: `N entries · X.X billable hours · $Y · [range]`, and call out the flag count ("3 need your eye").
+For every billing date range, search **all** of the following — don't skip any, don't assume one covers another:
 
-## Step 6 — Write the outputs
+1. **Outlook Sent Items** — `folderName: "Sent Items"` + date filter + `order: oldest`
+2. **Outlook Inbox** — `folderName: "Inbox"` + date filter + `order: oldest`
+3. **Outlook Deleted Items** — `folderName: "Deleted Items"` + date filter (exclude deleted drafts)
+4. **Outlook Calendar** — `query: "*"` + afterDateTime / beforeDateTime; use real meeting duration
+5. **Microsoft Teams** — `query: "*"` + date filters. **Wildcard is required** — keyword queries return zero. Paginate `nextOffset` → `offset` until exhausted; search thin days individually.
+6. **SharePoint / OneDrive** — matter keyword + date; confirm the modified date falls in range. Don't double-bill if already captured by an email entry.
+7. **Claude history** — `recent_chats()` / `conversation_search()` to detect days already billed in prior sessions (dedup, never re-bill).
+8. **Optional, if connected** — Zoom, Webex, Calendly meeting durations / transcripts.
 
-Write the entries to `timekeeper-entries-<start>_<end>.csv` in the working folder, header exactly:
-`matter,date,activity_description,note,price,quantity,type,activity_user,non_billable`
-Quote any field containing a comma, quote, or newline. This CSV is the file the firm imports into Clio.
+### Email API constraints (these silently fail)
 
-For a week- or month-scale run, also produce the polished **billing workbook** (`.xlsx`) per `${CLAUDE_PLUGIN_ROOT}/references/output-style.md` (Summary / Detail / Flags) — the reviewer's record — and offer the month-end **memo** when closing a period.
+- `folderName` + date filters: works.
+- `folderName` + `query` + date: **not supported** — drop the query, filter results manually.
+- `sender` + `folderName`: **not supported**.
+- Pagination: `offset` for folder+date; `cursor` for free-text `query`.
+
+## Step 4 — Draft (delegate to `entry-drafter`)
+
+Pass candidates to **entry-drafter**. Apply, in this order:
+
+1. **§ 330(a)(3)–(4) four-prong test** — benefit to estate, necessary to administration, no unnecessary duplication, time proportional to complexity. Fail or doubt → flag.
+2. **Categorical non-billables** — see `${CLAUDE_PLUGIN_ROOT}/references/non-billable.md`. Always exclude (phish alerts, vendor pitches, automated reports, personal receipts, internal Clio admin, social-only Teams replies, etc.).
+3. **No block billing** — each distinct issue or task gets its own line. "; and" or different topics in one entry → split.
+4. **Per-case policy** — Fikhman conservative; Laguna bill everything; Beloit selective; EVM Martin bills as Steve Donell. See `matters-and-rates.md`.
+5. **Honest time estimates** — never pad to hit a daily target, never trim below reality. Email volume alone doesn't drive duration. Total daily hours fall where honest per-task estimates land.
+6. **Round UP to the next tenth** — 1–6 min = 0.1, 7–12 = 0.2, … Minimum 0.1.
+7. **Description voice** — present-tense billing verb first (Review, Draft, Coordinate, Correspond, Prepare, Discuss, Attend, etc.); name people by full name; specific; no privileged substance; no filler ("briefly", "quickly", "worked on").
+8. **Matter assignment** — confirmed mapping → property/entity/party reference → counterparty domain → thread continuity. **Rates file is authoritative — never invent a matter name.** Sender identity alone is never sufficient (Brian Landau, Ori Blumenfeld, Peggy Lennon span matters).
+
+## Step 5 — Review surface (cards + Clio button)
+
+Show the drafted entries for review before anything leaves.
+
+- **Cowork:** clean card stack — one card per entry: date · duration · matter · rate · description · M365 citation · flag (if any).
+- **Claude.ai / Claude Code:** the same content as a clean Markdown table.
+
+Above the cards, a one-line summary: `N entries · X.X billable hours · $Y · [range]` and the flag count ("3 need your eye"). Flagged entries first.
+
+Below the cards, two actions:
+1. **Open Clio** — link / button to `https://app.clio.com/nc/#/activities`. For a single quick entry, the user clicks through and enters Duration + Matter + Description from the card directly in Clio's New Time Entry form.
+2. **Bulk import** — show the path to the CSV (Step 6). For more than two or three entries, this is the right path.
+
+Keep it a calm review surface, not a dashboard.
+
+## Step 6 — Write the outputs (to the working folder)
+
+To the user's chosen working folder, write:
+
+1. **CSV** — `Timekeeper-Entries_<TK>_<start>_<end>.csv` (always).
+2. **Workbook** — `Billing-Workbook_<TK>_<period>.xlsx` for any week- or month-scale run (Summary / Detail / Flags tabs per `${CLAUDE_PLUGIN_ROOT}/references/output-style.md`).
+3. **Memo** — `Billing-Memo_<period>.pdf` at month-end or on request.
+
+A one-off single-entry run only writes nothing — the card + Clio button are enough.
+
+### CSV schema (exact, 9 columns)
+
+Header row, in this order:
+
+```
+matter,date,activity_description,note,price,quantity,type,activity_user,non_billable
+```
+
+- `matter` — exact Clio display name. Sub-matters: `Matter Name - Sub-matter`. Confirm with user if not obvious.
+- `date` — `M/D/YYYY`.
+- `activity_description` — **blank** (reserved for Clio activity-category templates).
+- `note` — the billing description (what the client sees on the invoice).
+- `price` — hourly rate (no `$`).
+- `quantity` — decimal hours (e.g. `0.3`).
+- `type` — **blank** (= TimeEntry).
+- `activity_user` — timekeeper's full name (e.g. `Sarah Bates`).
+- `non_billable` — `false` (or blank); `true` only for recorded-but-not-charged.
+
+### CSV encoding (prevents column drift on Clio import)
+
+- **Quote every field** (QUOTE_ALL) — Clio's own export format.
+- **UTF-8 BOM** (`utf-8-sig`) — so Excel opens it as UTF-8.
+- **Plain ASCII punctuation** — convert em dashes (`—` → ` - `), curly quotes, multi-byte chars.
+- **Verify before delivering:** every row has exactly **9 columns**, and columns C (`activity_description`) and G (`type`) are blank.
 
 ## Step 7 — Hand off
 
-Tell the user what's flagged and why (the `REVIEW FLAGGED` lines), then offer next steps:
-- **Export the CSV + workbook** — the Step 6 `timekeeper-entries-<range>.csv` (the file the firm imports into Clio) plus the billing workbook for the reviewer.
-- Adjust and re-render, run `billing-review` for a QA pass, or `publish` the CSV + workbook to the `automation` SharePoint site (`Billing Drafts/<year>/<month>/`, see `${CLAUDE_PLUGIN_ROOT}/references/output-style.md`).
+Print:
+- One-line summary (entries · hours · $ · range).
+- What's flagged and why (the `REVIEW FLAGGED` lines from the drafter).
+- The **Open Clio** button and the CSV path for bulk import.
+- The workbook path if produced.
 
-Close with: ready to review and import into Clio.
+Close with: *"Ready to review and import into Clio."*
 
 ## Guardrails
 
 - Never invent activity, durations, or matter names. Missing signal → conservative estimate + flag.
-- Never auto-publish or auto-bill. The human review at Step 5 is the point.
+- Never auto-bill. The review at Step 5 is the point.
 - Don't quote privileged content in descriptions — describe the work, not the substance.
+- Don't anchor totals to a daily target (e.g. 8 hours). Hours fall where honest per-task estimates land.

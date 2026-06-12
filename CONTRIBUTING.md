@@ -5,13 +5,13 @@ Thanks for the interest. This marketplace is maintained by Patrick King for **Di
 ## Scope
 
 - **In scope:** bug fixes, M365 connector improvements, billing-format tweaks, new optional connectors (Zoom / Webex / Calendly / etc.), documentation fixes.
-- **Out of scope:** anything that writes to a system of record without human review, telemetry, or model-training plumbing.
+- **Out of scope:** anything that writes to a system of record (Clio, SharePoint, etc.) without human review, telemetry, or model-training plumbing.
 
 ## Ground rules
 
 - Every billable entry must remain human-reviewed before it's billed. Don't add code paths that bypass review.
 - Plugin files are read-only after install. Persistent learned state belongs in the user's working folder (`learned-mappings.md`), not in this repo.
-- No bundled MCP servers. Timekeeper relies on Claude's native connectors (Microsoft 365 required; Zoom / Webex / Calendly optional).
+- No bundled MCP servers. Timekeeper relies on Claude's native connectors (Microsoft 365 required; Zoom / Webex / Calendly optional). No SharePoint write — outputs land in a working folder the user chooses.
 - No AI-attribution footers, `Co-Authored-By` trailers, generated-by notices, or bot accounts in commits, PRs, CODEOWNERS, AUTHORS, or package metadata.
 
 ## Working on a change
