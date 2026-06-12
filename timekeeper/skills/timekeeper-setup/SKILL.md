@@ -39,4 +39,4 @@ Confirmed knowledge that overrides the bundled defaults. Edit freely.
 
 ## Output
 
-A short status: each connector ✅/⚠️/❌ with what to do about any gap, the confirmed working folder, and confirmation that `learned-mappings.md` exists. For passwords, account access, or the Keeper password manager, point to the `it-support` skill (handled by DivergeIT). End by pointing them at `draft-time-entries` ("say: draft my time for last week") for their first run.
+A short status: each connector ✅/⚠️/❌ with what to do about any gap, the confirmed working folder, and confirmation that `learned-mappings.md` exists. For passwords, account access, or the Keeper password manager, point to the `it-support` skill. End by pointing them at `draft-time-entries` ("say: draft my time for last week") for their first run.

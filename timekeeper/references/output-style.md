@@ -51,7 +51,7 @@ Use `pdf` for a fixed sign-off PDF; `docx` if they want to edit before sending.
 ## Branding
 
 - Drop a firm logo at `<working folder>/branding/` (or the plugin's `assets/` if bundled). The workbook title block and memo letterhead use it when present.
-- **No FedReceiver mark yet** → default to the neutral professional style. The Claude/Anthropic assets in the project `Resources/Branding` are for DivergeIT decks, **not** client deliverables.
+- **No Jalmar Properties mark yet** → default to the neutral professional style. The Claude/Anthropic assets in the project `Resources/Branding` are for internal decks, **not** client deliverables.
 
 ## File naming
 

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "ms365": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@softeria/ms-365-mcp-server",
+        "--org-mode",
+        "--read-only"
+      ],
+      "env": {}
+    }
+  }
+}

@@ -1,17 +1,17 @@
-# DivergeIT — Claude plugin marketplace
+# Claude plugin marketplace
 
-Private plugin marketplace for DivergeIT client automations.
+Private plugin marketplace maintained by Patrick King.
 
 ## Plugins
 
 | Plugin | What it does |
 |---|---|
-| [`timekeeper`](./timekeeper) | Microsoft 365-native legal time reconstruction & billing for FedReceiver, Inc. — mines Outlook / Teams / calendar, drafts court-defensible entries to the firm's standards, and exports a Clio import CSV plus a polished billing workbook. Skills + agents; no MCP. |
+| [`timekeeper`](./timekeeper) | Microsoft 365-native legal time reconstruction & billing for Jalmar Properties, Inc. — mines Outlook / Teams / calendar, drafts court-defensible entries to the firm's standards, and exports a Clio import CSV plus a polished billing workbook. Skills + agents + a bundled read-only Microsoft 365 MCP server. |
 
 ## Install — Claude Code
 
-    /plugin marketplace add patrickking67/divergeit-marketplace
-    /plugin install timekeeper@DivergeIT
+    /plugin marketplace add patrickking67/claude-marketplace
+    /plugin install timekeeper@claude-marketplace
 
 ## Install — Cowork / Claude.ai
 
@@ -19,4 +19,4 @@ Add this repository as a marketplace, then install **timekeeper**. The only requ
 
 ---
 
-Maintained by Patrick King · DivergeIT
+Maintained by Patrick King
