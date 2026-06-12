@@ -67,34 +67,7 @@ Resolve the date range to ISO start / end in **Pacific time** (see Step 2). If "
 
 ## Step 2 — Big research (delegate to `activity-miner`)
 
-Hand `{billable_user, range, scope, notes, default_billable}` to **activity-miner**. It runs the full sweep across every connected source in parallel — don't do it inline.
-
-### Mandatory: Pacific-time day boundaries
-
-The firm works in **Pacific time**. Every "day" search covers a full **Pacific day**. A UTC-midnight window drops evening work and silently omits billable items — the #1 cause of "missing" time.
-
-- **Preferred — local boundaries:** `afterDateTime: "<Month Day Year> 12:00am"` / `beforeDateTime: "<Month Day Year> 11:59pm"`. Natural-language local handles DST automatically.
-- **Manual UTC:** PDT (≈Mar–Nov, UTC−7) → target day `07:00Z` to next day `07:00Z`; PST (≈Nov–Mar, UTC−8) → `08:00Z` to `08:00Z`.
-
-### Mandatory: all sources searched
-
-For every billing date range, search **all** of the following — don't skip any, don't assume one covers another:
-
-1. **Outlook Sent Items** — `folderName: "Sent Items"` + date filter + `order: oldest`
-2. **Outlook Inbox** — `folderName: "Inbox"` + date filter + `order: oldest`
-3. **Outlook Deleted Items** — `folderName: "Deleted Items"` + date filter (exclude deleted drafts)
-4. **Outlook Calendar** — `query: "*"` + afterDateTime / beforeDateTime; use real meeting duration
-5. **Microsoft Teams** — `query: "*"` + date filters. **Wildcard is required** — keyword queries return zero. Paginate `nextOffset` → `offset` until exhausted; search thin days individually.
-6. **SharePoint / OneDrive** — matter keyword + date; confirm the modified date falls in range. Don't double-bill if already captured by an email entry.
-7. **Claude history** — `recent_chats()` / `conversation_search()` to detect days already billed in prior sessions (dedup, never re-bill).
-8. **Optional, if connected** — Zoom, Webex, Calendly meeting durations / transcripts.
-
-### Email API constraints (these silently fail)
-
-- `folderName` + date filters: works.
-- `folderName` + `query` + date: **not supported** — drop the query, filter results manually.
-- `sender` + `folderName`: **not supported**.
-- Pagination: `offset` for folder+date; `cursor` for free-text `query`.
+Hand `{billable_user, range, scope, notes, default_billable, attachments}` to **activity-miner**. It runs the full sweep across every connected source in parallel per the contract in `${CLAUDE_PLUGIN_ROOT}/references/m365-mining.md` — Pacific-time boundaries, all 7 sources required (Sent / Inbox / Deleted / Calendar / Teams / SharePoint / Claude history), Teams wildcard, email-API constraints. Don't do the sweep inline.
 
 ## Step 3 — Zero-results fallback
 
@@ -111,18 +84,12 @@ Don't return an empty CSV. Either widen the search, switch identity, manually ca
 
 ## Step 4 — Draft (delegate to `entry-drafter`)
 
-Pass candidates + `{billable_user, default_billable, notes}` to **entry-drafter**. Apply, in this order:
+Pass candidates + `{billable_user, default_billable, notes}` to **entry-drafter**. The drafter follows `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md` (CSV schema, voice, rounding), `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md` (per-user × per-matter rates, per-case policies, matter assignment), and `${CLAUDE_PLUGIN_ROOT}/references/non-billable.md` (§ 330 four-prong test + categorical exclusions).
 
-1. **§ 330(a)(3)–(4) four-prong test** — benefit to estate, necessary to administration, no unnecessary duplication, time proportional to complexity. Fail or doubt → flag.
-2. **Categorical non-billables** — see `${CLAUDE_PLUGIN_ROOT}/references/non-billable.md`. Always exclude (phish alerts, vendor pitches, automated reports, personal receipts, internal Clio admin, social-only Teams replies, etc.).
-3. **No block billing** — each distinct issue or task gets its own line. "; and" or different topics in one entry → split.
-4. **Per-case policy** — Fikhman conservative; Laguna bill everything; Beloit selective; EVM Martin bills as Steve Donell regardless of who did the work. See `matters-and-rates.md`.
-5. **Billable user** — set `activity_user = <picked billable_user>` on every entry. The per-matter rate (`price`) follows that user × matter.
-6. **Billable / non-billable** — default per the Step 1 questionnaire's toggle. The drafter still flips entries to `non_billable = true` when they're administrative or fail § 330 (e.g. a tracked internal-IT email that surfaced).
-7. **Honest time estimates** — never pad to hit a daily target, never trim below reality. Email volume alone doesn't drive duration. Total daily hours fall where honest per-task estimates land.
-8. **Round UP to the next tenth** — 1–6 min = 0.1, 7–12 = 0.2, … Minimum 0.1.
-9. **Description voice** — present-tense billing verb first (Review, Draft, Coordinate, Correspond, Prepare, Discuss, Attend, etc.); name people by full name; specific; no privileged substance; no filler ("briefly", "quickly", "worked on").
-10. **Matter assignment** — confirmed mapping → property/entity/party reference → counterparty domain → thread continuity. **Rates file is authoritative — never invent a matter name.** Sender identity alone is never sufficient (Brian Landau, Ori Blumenfeld, Peggy Lennon span matters).
+Run-specific overrides from Step 1:
+- `activity_user` = the picked billable user on every row (the per-matter rate follows from that user × matter).
+- Default `non_billable` per the questionnaire toggle; the drafter still flips entries that fail § 330 to non-billable regardless of the default.
+- Notes can narrow scope ("just FTC") or pre-exclude ("skip standups") — treat as authoritative; flag conflicts rather than silently overriding.
 
 ## Step 5 — Review surface (clean cards + big Clio Manage button)
 
@@ -152,40 +119,13 @@ Per-entry edits (billable user / billable-or-not) happen inline on the card — 
 
 ## Step 6 — Write the CSV (to the working folder)
 
-The end output is **just the CSV**. To the user's chosen working folder, write:
+The end output is **just the CSV**, written to the working folder as:
 
 ```
 Timekeeper-Entries_<billable_user>_<start>_<end>.csv
 ```
 
-That's it. No `.xlsx` workbook, no memo. (Those live in the `billing` skill for month-end workbook reviews — not in the default time-entry flow.)
-
-A one-off single-entry run writes nothing — the card + Clio button are enough.
-
-### CSV schema (exact, 9 columns)
-
-Header row, in this order:
-
-```
-matter,date,activity_description,note,price,quantity,type,activity_user,non_billable
-```
-
-- `matter` — exact Clio display name. Sub-matters: `Matter Name - Sub-matter`. Confirm with user if not obvious.
-- `date` — `M/D/YYYY`.
-- `activity_description` — **blank** (reserved for Clio activity-category templates).
-- `note` — the billing description (what the client sees on the invoice).
-- `price` — hourly rate (no `$`).
-- `quantity` — decimal hours (e.g. `0.3`).
-- `type` — **blank** (= TimeEntry).
-- `activity_user` — the billable user picked in Step 1 (e.g. `Sarah Bates`). Same on every row in the run (unless an entry was overridden in review).
-- `non_billable` — `false` (or blank) for billable; `true` for recorded-but-not-charged.
-
-### CSV encoding (prevents column drift on Clio import)
-
-- **Quote every field** (QUOTE_ALL) — Clio's own export format.
-- **UTF-8 BOM** (`utf-8-sig`) — so Excel opens it as UTF-8.
-- **Plain ASCII punctuation** — convert em dashes (`—` → ` - `), curly quotes, multi-byte chars.
-- **Verify before delivering:** every row has exactly **9 columns**, and columns C (`activity_description`) and G (`type`) are blank.
+Schema, quoting, encoding, and the 9-column verification are defined in `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md` — follow that file exactly. A one-off single-entry run writes nothing (the card + Clio button are enough). No `.xlsx`, no memo here — those live in the `billing` skill for month-end.
 
 ## Step 7 — Hand off
 

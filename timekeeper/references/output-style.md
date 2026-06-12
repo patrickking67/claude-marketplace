@@ -10,7 +10,7 @@ The single intake at the top of a `draft-time-entries` run. Five fields + an opt
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│  Draft time entries                                  │
+│  [firm-logo 24px]  Draft time entries                │
 │                                                      │
 │  1. Date range                                       │
 │     ◉ Last week   ○ Today   ○ This week              │
@@ -28,6 +28,8 @@ The single intake at the top of a `draft-time-entries` run. Five fields + an opt
 │           └──────────────────────┘                   │
 └──────────────────────────────────────────────────────┘
 ```
+
+Header logo from `${CLAUDE_PLUGIN_ROOT}/assets/firm-logo.png`, 24px, left-aligned. Title in normal weight, no all-caps.
 
 - **Width:** card-width, single column.
 - **Submit button:** Clio-blue-adjacent or firm-neutral primary color — but smaller than the post-review *Open Clio Manage* button (that one is the visual climax of the run, this is just the kickoff).
@@ -79,24 +81,43 @@ N entries · X.X billable hours · $Y · <range> · billable to <user>
 
 Flagged entries come first, then chronological.
 
-### Below the cards — the Clio Manage button
+### Below the cards — the Clio button
+
+Compact, branded, single action. Sized to feel like a real Clio "Open in Clio" affordance — not a hero banner.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                Open Clio Manage  →                          │   ← Clio brand blue (#2A4FB9)
-└─────────────────────────────────────────────────────────────┘    background, white bold text
-
+                ┌────────────────────────────┐
+                │ [Clio mark]  Open Clio  →  │     ← ≈ 240px wide, Clio brand
+                └────────────────────────────┘       background, white text
 Bulk import: <working-folder>/Timekeeper-Entries_<user>_<start>_<end>.csv
 ```
 
-- **In Cowork:** render as a full-width card-button. Background ≈ Clio brand blue (`#2A4FB9`), text white, bold, ~16–18px, right-arrow glyph. The button is the primary visual weight on the screen — bigger than any single entry card.
-- **In Claude.ai / Claude Code:** render as an emphasized markdown link styled to stand out:
-  ```
-  ### → [Open Clio Manage](https://app.clio.com/nc/#/activities)
-  ```
-  Then the small `Bulk import: <path>` line under it.
+- **Size:** ≈ 240–280px wide × 40–44px tall. Centered. Smaller than the questionnaire's Run-sweep button, smaller than the entry cards.
+- **Background:** Clio brand blue. Use `#3A6FD8` as the working hex (their current marketing blue trends to that range); the rendering layer can swap to whatever Clio is using if it has the asset.
+- **Text:** "Open Clio" or "Open Clio Manage" → white, semibold, ~14–15px.
+- **Logo:** the Clio "C" mark, left of the text. Reference Clio's public mark at `https://www.clio.com/favicon.ico` (24×24) or, if the surface has Clio's brand SVG, prefer that. Don't bundle Clio assets in the plugin.
+- **Link target:** `https://app.clio.com/nc/#/activities`.
+- **Below the button:** small monospace line — `Bulk import: <csv-path>`.
 
-The button always links to `https://app.clio.com/nc/#/activities` — Clio's New Time Entry page.
+In Claude.ai / Claude Code (no rich buttons), render as a single emphasized link line — no oversized formatting:
+
+```
+[![Clio](https://www.clio.com/favicon.ico)  Open Clio →](https://app.clio.com/nc/#/activities)
+
+Bulk import: <csv-path>
+```
+
+## Firm branding
+
+The firm logo is bundled at `${CLAUDE_PLUGIN_ROOT}/assets/firm-logo.png` (square, 512×512 PNG). Use it for:
+
+- **Questionnaire card header** — 24–28px in the top-left of the questionnaire, left of "Draft time entries".
+- **Review surface header** — same size, left of the run summary line ("Sarah Bates · Mar 2 – Mar 6, 2026 · 12 entries · 8.4 hr · $3,320").
+- **Workbook / memo letterhead** (`billing` skill only) — 64–80px, centered or top-left of the title block.
+
+Keep it small and quiet — accent, not headline. Never frame, never add a drop shadow, never colorize.
+
+If the working folder contains `branding/firm-logo.png`, prefer it over the bundled one. That's how a future firm overrides without forking the plugin.
 
 ### Per-entry inline edits
 
@@ -155,7 +176,3 @@ Columns: `Pattern` · `Reason` · `ConfirmedDate`.
 Default `draft-time-entries` runs only append to `Entries` (plus any confirmed Mappings / Rates / Skips). No new files, no summary sheet, no memo unless asked.
 
 
-## Branding
-
-- Drop a firm logo at `<working folder>/branding/`. The workbook title block and memo letterhead use it when present.
-- Cards stay neutral — no logo on the review surface.
