@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_Timekeeper_ms365",
+      "mcp__ms365"
+    ]
+  }
+}

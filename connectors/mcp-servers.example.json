@@ -1,0 +1,27 @@
+{
+  "_README": "Optional connectors for Timekeeper. The active config lives in the plugin's .mcp.json (ms365, required, read-only). To enable an optional connector, copy its block into the `mcpServers` object of .mcp.json and fill in the URL/token. Zoom for Claude, Webex, and Calendly are remote OAuth connectors — you may instead add them from Claude's connector directory. `clio-manage` is the PLANNED remote replacement for the import-CSV hand-off.",
+
+  "mcpServers": {
+    "clio-manage": {
+      "type": "http",
+      "url": "https://<your-clio-manage-mcp-endpoint>/mcp",
+      "icon": "${CLAUDE_PLUGIN_ROOT}/assets/clio-manage-logo.png",
+      "_note": "PLANNED. Remote Clio Manage connector to read matters/rates and write activities directly, replacing the import CSV. Set the connector's display icon to the official Clio Manage logo per Clio brand guidelines."
+    },
+    "zoom": {
+      "type": "http",
+      "url": "https://mcp.zoom.us/mcp",
+      "_note": "Zoom for Claude — meetings, recordings, transcripts as billable meeting time."
+    },
+    "webex": {
+      "type": "http",
+      "url": "https://<webex-mcp-endpoint>/mcp",
+      "_note": "Webex — meetings/calls as billable events."
+    },
+    "calendly": {
+      "type": "http",
+      "url": "https://<calendly-mcp-endpoint>/mcp",
+      "_note": "Calendly — scheduled consultations as billable events."
+    }
+  }
+}

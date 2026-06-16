@@ -1,15 +1,17 @@
 {
-  "name": "DivergeIT",
+  "name": "divergeit",
+  "description": "DivergeIT — legal-practice automation. The Timekeeper plugin for Microsoft 365-native time reconstruction and Clio billing.",
   "owner": {
-    "name": "Patrick King",
-    "url": "https://github.com/patrickking67"
+    "name": "DivergeIT",
+    "url": "https://divergeit.com"
   },
   "plugins": [
     {
       "name": "timekeeper",
-      "source": "./timekeeper",
-      "description": "Microsoft 365-native legal practice assistant — time reconstruction, polished billing workbooks and memos, billing review, matters, contacts, enterprise search, calendar, and document parsing. Exports import-ready CSVs for Clio Manage and saves polished `.xlsx` workbooks to a working folder you pick. Built for Jalmar Properties, Inc.",
-      "version": "1.10.2",
+      "displayName": "Timekeeper",
+      "source": ".",
+      "description": "Microsoft 365-native legal practice assistant for fiduciary/receivership firms. Adaptively reconstructs billable time for one, several, or all timekeepers; sets exact per-matter rates from an authoritative rate card; drafts court-defensible, present-tense entries; reviews and reconciles billing; and ends with an import-ready Clio CSV plus a direct Clio import hand-off. Also: matters, contacts, calendar, M365 search, and pdf/docx/xlsx/csv parsing + creation. Built by DivergeIT for FedReceiver / Jalmar Properties.",
+      "version": "2.0.0",
       "category": "legal",
       "tags": [
         "legal",
