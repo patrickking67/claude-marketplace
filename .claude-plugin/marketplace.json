@@ -9,9 +9,9 @@
     {
       "name": "timekeeper",
       "displayName": "Timekeeper",
-      "source": ".",
+      "source": "./",
       "description": "Microsoft 365-native legal practice assistant for fiduciary/receivership firms. Adaptively reconstructs billable time for one, several, or all timekeepers; sets exact per-matter rates from an authoritative rate card; drafts court-defensible, present-tense entries; reviews and reconciles billing; and ends with an import-ready Clio CSV plus a direct Clio import hand-off. Also: matters, contacts, calendar, M365 search, and pdf/docx/xlsx/csv parsing + creation. Built by DivergeIT for FedReceiver / Jalmar Properties.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "category": "legal",
       "tags": [
         "legal",

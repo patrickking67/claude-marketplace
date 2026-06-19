@@ -1,0 +1,6 @@
+# Timekeeper allowlist — Microsoft 365 primary emails / UPNs authorized to use Timekeeper.
+# One address per line. Lines starting with # are ignored, case-insensitive.
+# To change who can use Timekeeper: edit this list, bump the plugin version, and push.
+steve.donell@fedreceiver.com
+sarah.bates@fedreceiver.com
+ditadmin@jalmar.com

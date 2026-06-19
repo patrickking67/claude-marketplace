@@ -6,10 +6,10 @@ Fiduciary-services firm. Principals act as court-appointed **receiver**, **parti
 
 - **Time zone is Pacific.** Every M365 search must cover a full **Pacific-time day** (local boundaries, or 07:00→07:00Z in PDT / 08:00→08:00Z in PST). UTC-midnight windows drop evening work — the #1 cause of missing time. See `m365-mining.md`.
 - **Billing cadence:** monthly. Recurring "Previous Month Billing Due on the 7th" / "Team Meeting" → bill **0.3 hrs** to FTC v. American Tax Service, et al.
-- **System of record:** Clio Manage. Time is handed off today via an **import CSV** (see `billing-format.md`); a remote Clio Manage connector is planned to replace it.
+- **System of record:** Clio Manage. Time is handed off today via an **import CSV** (see `billing-format.md`); a native Clio connector is planned to replace it.
 - **AR reality (context only, do not bill on it):** most invoices run Past Due with large balances; collections is a live concern but never affects what is billed.
 
-## Active matters (exact Clio display names — reload from the live Clio matters export each run)
+## Active matters (exact Clio display names — bundled snapshot at `${CLAUDE_PLUGIN_ROOT}/references/matters.csv`; reload from a fresher Clio export each run)
 
 1427 15th Street Receivership · 8619-8621 Wilshire Referee Estate · Beloit Receivership Estate · Bergazin Referee Estate · Birdies Receivership Estate · CCOA Receivership · Crenshaw Blvd. Referee Estate · East Valley Referee Estate · Eprazel Receivership Estate · Estate of Nina Ruth Chomsky · FTC v. American Tax Service, et al. · FTC v. Ascend Capventures, et al. · Fikhman Receivership · Foreside Receivership Estate · Gledhill Referee Estate · Harris Avenue Referee Estate · Infiniti Health Receivership · Laguna Beach Receivership Estate · Leighton Ave Receivership Estate · Long Beach Eucl. Apts., LLC · Long Beach Vers. Apts., LLC · Maie Avenue Receivership · Malibu Receivership Estate · Martin Apartments, LLC · Mason Turk Receivership · Nature's Growers Receivership Estate · O'Farrell Referee Estate · Pacific Avenue Referee Estate · Parachute Technology, Inc. · Pine Hollow Receivership Estate · S. Brower Living Trust · SF Eagle Bar Receivership · Sea Star Estates HOA · South Hobart Referee Estate · Spalding HOA Receivership Estate · Stout Receivership · Tomko Receivership Estate · Waid Receivership Estate · Youssif v. Youssif, et al. · Zola Hospice Receivership Estate
 
@@ -21,4 +21,4 @@ Steve Donell · Sarah Bates · Lisa Qin · Laura Urbano · Todd Donell · James 
 
 ## Clio import hand-off (where every time-entry run ends)
 
-The firm imports the CSV into **Clio Manage → Settings → Import** (`https://app.clio.com/nc/#/settings?path=imports`). Critical: choose the **Activities / Time Entries** import type — **not** "Tasks from CSV" (Tasks can't map the rate/hours/type columns). Matters must already exist in Clio, spelled exactly. See `billing-format.md` for the CSV contract and the end of `draft-time-entries` for the hand-off script.
+The firm imports the CSV into **Clio Manage → Settings → Import** (`https://app.clio.com/nc/#/settings?path=imports`). Critical: choose the **Activities / Time Entries** import type — **not** "Tasks from CSV" (Tasks can't map the rate/hours/type columns). Matters must already exist in Clio, spelled exactly. See `billing-format.md` for the CSV contract and the end of `time-entry` for the hand-off script.

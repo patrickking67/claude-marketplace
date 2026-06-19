@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.1.0 — 2026-06-19
+
+**Connectors — native only**
+- Dropped the bundled `@softeria/ms-365-mcp-server`; `.mcp.json` ships empty. Timekeeper now uses Claude's **native** Microsoft 365 connector for all M365 data, with **Zoom for Claude** optional and a **native Clio** connector planned (CSV import until then). Rewrote `CONNECTORS.md`; removed `connectors/mcp-servers.example.json`.
+
+**Skills — friendlier names**
+- `draft-time-entries` → **`time-entry`**, with a **fast inline path for short ranges** (a day or two skips the Opus sweep) and the full multi-agent path for weeks / months / all-timekeepers.
+- `billing-best-practices` → **`billing-rules`**.
+- Removed the **`it-support`** skill — IT / access / password requests route to the firm's IT support provider.
+- `timekeeper-setup` kept as-is.
+
+**Clio reference data**
+- Added `references/matters.csv` (matters export), `data/sample-contacts.csv` (contacts export), and `data/sample-clio-import.csv` (a real time-entry import), plus `references/clio-exports.md` mapping each Clio export/report to the skill that reads it. Wired into `matters`, `contacts`, `billing`, and `firm-context.md`.
+
+**Access control**
+- Added an **in-plugin allowlist gate** (`hooks/hooks.json` + `hooks/allowlist-gate.mjs` + `hooks/allowed-users.txt`): a SessionStart hook that restricts Timekeeper to allowlisted Microsoft 365 users (Steve Donell, Sarah Bates, plus a test admin) and declines for anyone else. Advisory — pair with private-repo access / managed-settings scoping. `INSTALL.md` documents org-wide deployment + the gate.
+
+**Meta**
+- `author` → **Patrick King** (marketplace owner stays DivergeIT).
+- `INSTALL.md`: added **Restricting to certain users** (private-repo access control).
+- Plugin + marketplace version → 2.1.0.
+
 ## 2.0.0 — 2026-06-15
 
 **Branding & distribution**

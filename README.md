@@ -1,20 +1,20 @@
 # Timekeeper
 
-**A Microsoft 365-native legal practice assistant.** Reconstruct billable time, review billing, look up matters and contacts, search across M365, parse documents, and get IT support — all human-reviewed, with no writes to any system of record.
+**A Microsoft 365-native legal practice assistant.** Reconstruct billable time, review billing, look up matters and contacts, search across M365, and parse documents — all human-reviewed, with no writes to any system of record.
 
-> Built by **DivergeIT** for **FedReceiver / Jalmar Properties, Inc.** Runs in **Claude.ai, Claude Cowork, and Claude Code**. Adaptive across one, several, or all timekeepers; sets exact per-matter rates from `references/rate-card.csv`; ends with an import-ready Clio CSV + a direct Clio import hand-off. Install: see `INSTALL.md`. No Clio connection required yet (a remote Clio Manage connector is planned).
+> Built by **DivergeIT** for **FedReceiver / Jalmar Properties, Inc.** Runs in **Claude.ai, Claude Cowork, and Claude Code**. Adaptive across one, several, or all timekeepers; sets exact per-matter rates from `references/rate-card.csv`; ends with an import-ready Clio CSV + a direct Clio import hand-off. Install: see `INSTALL.md`. No Clio connection required yet (a native Clio connector is planned).
 
 ---
 
 ## What it does
 
-You tell Timekeeper *who* and *what dates*; it mines Outlook, Teams, and calendar, maps work to the firm's matters and rate card, drafts court-defensible entries in the firm's exact billing format, shows them for review, and produces an import-ready CSV plus a polished billing workbook (and a sign-off memo at month-end). Around that core it also handles matter and contact lookup, calendar review, enterprise search, document parsing, billing QA, and IT support. A human reviews everything before it's billed.
+You tell Timekeeper *who* and *what dates*; it mines Outlook, Teams, and calendar, maps work to the firm's matters and rate card, drafts court-defensible entries in the firm's exact billing format, shows them for review, and produces an import-ready CSV plus a polished billing workbook (and a sign-off memo at month-end). Around that core it also handles matter and contact lookup, calendar review, enterprise search, document parsing, and billing QA. A human reviews everything before it's billed.
 
 ## Skills
 
 | Skill | What it does |
 |---|---|
-| `draft-time-entries` | The main interactive workflow — interview, confirm, mine M365, review, export CSV + workbook |
+| `time-entry` | The main workflow — confirm, mine M365, review, export CSV + workbook. Short ranges take a fast inline path; longer ones use the full sweep |
 | `billing` | QA drafts, reconcile against an invoice, find unbilled time, run month-end, publish |
 | `matters` | Find and confirm the right matter from the current matter list + M365 signals |
 | `contacts` | Look up and organize clients, counsel, and vendors |
@@ -22,8 +22,7 @@ You tell Timekeeper *who* and *what dates*; it mines Outlook, Teams, and calenda
 | `calendar` | Review and plan from the M365 calendar; surface deadlines and billable events |
 | `documents` | Parse and produce xlsx, docx, pptx, pdf (invoices, workbooks, contracts, reports) |
 | `timekeeper-setup` | First-run connector check + the `learned-mappings.md` overlay |
-| `billing-best-practices` | Defensible-billing + § 330 + legal-AI ethics + company-data governance |
-| `it-support` | IT support — access, accounts, and the Keeper password manager |
+| `billing-rules` | Defensible-billing + § 330 + legal-AI ethics + company-data governance |
 
 ## Agents
 
@@ -38,20 +37,17 @@ Discovery runs on Opus (hardest judgment), routing on Haiku (cheap/frequent), th
 
 ## Connectors
 
-Microsoft 365 (required, read) and SharePoint/OneDrive (optional, write). No Clio or legal-research connectors — see [`CONNECTORS.md`](./CONNECTORS.md).
+All via Claude's **native connectors** — nothing is bundled or run locally. Microsoft 365 (required, read) and SharePoint/OneDrive (optional, write); **Zoom for Claude** optional for meeting time; a **native Clio** connector is planned (CSV import until then). See [`CONNECTORS.md`](./CONNECTORS.md).
 
 ## Install
 
-Skills + agents, plus a bundled read-only Microsoft 365 MCP server (`@softeria/ms-365-mcp-server`, started on demand via `npx` — requires Node 18+). No build step.
+Skills + agents only — **no bundled MCP server, no build step.** Timekeeper uses Claude's native connectors for all data.
 
 - **Cowork:** open `Timekeeper.plugin`, click **Save plugin**.
-- **Claude Code:** `claude /plugin marketplace add <this folder>` then `claude /plugin install timekeeper@claude-marketplace`.
+- **Claude Code:** `claude /plugin marketplace add patrickking67/claude-marketplace` then `claude /plugin install timekeeper@divergeit`.
 - **Claude.ai:** add the skills to your workspace.
 
-Then connect Microsoft 365 (read) — the only requirement:
-
-- **Claude Code:** the bundled `ms365` server runs locally; on first use it prompts a one-time device-code sign-in (run the `login` tool / `/mcp`). It's launched in `--org-mode --read-only`, so it never sends mail or changes anything in M365.
-- **Cowork / Claude.ai:** connect the hosted Microsoft 365 connector instead — the skills are connector-agnostic and use whichever M365 source is present.
+Then enable the **native Microsoft 365 connector** (read) from Claude's connector directory — the only requirement. The skills are connector-agnostic and use whichever M365 source is present; everything is read-only, so Timekeeper never sends mail or changes anything in M365. See [`CONNECTORS.md`](./CONNECTORS.md) for the full list (M365, optional SharePoint write, optional Zoom, planned Clio).
 
 Reviewed output saves to the working folder or, with a write-capable Microsoft connector, publishes to the firm's SharePoint site (see [`CONNECTORS.md`](./CONNECTORS.md)).
 
@@ -59,9 +55,11 @@ Reviewed output saves to the working folder or, with a write-capable Microsoft c
 
 Plugin files are read-only after install, so Timekeeper keeps `learned-mappings.md` in your working folder — confirmed contact→matter mappings, timekeeper rates, and skip rules accumulate there. `timekeeper-setup` creates it.
 
-## Company data & support
+## Company data
 
-Timekeeper follows the firm's data-handling rules (see `billing-best-practices`): high-sensitivity defaults, describe-the-work-not-the-content for privilege, no model training on firm data, and escalation paths. The firm's password manager is **Keeper** — request access through IT support (see `it-support`).
+Timekeeper follows the firm's data-handling rules (see `billing-rules`): high-sensitivity defaults, describe-the-work-not-the-content for privilege, no model training on firm data, and escalation paths. The firm's password manager is **Keeper** — request access through the firm's IT support provider.
+
+Use is gated to an **allowlist** of authorized Microsoft 365 users (`hooks/allowed-users.txt`) via a SessionStart hook — see [INSTALL.md](./INSTALL.md#restricting-to-certain-users).
 
 ## License
 

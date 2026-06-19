@@ -1,5 +1,5 @@
 ---
-name: billing-best-practices
+name: billing-rules
 description: Defensible-billing, legal-AI ethics, and company-data governance that apply across all Timekeeper work. Use whenever drafting, reviewing, or publishing time entries, when handling firm documents or contacts, and when someone asks is this defensible or ethical, ABA 512, can AI draft my time, what about confidentiality, how should we handle this data, or will this survive a fee audit.
 ---
 
@@ -35,7 +35,7 @@ Default to **high sensitivity**. Apply across every skill:
 2. **Residency & retention** — assume conversations contain firm data; don't persist sensitive data beyond the working session; firm data is not used to train models. Remind users that external tools may retain data.
 3. **Compliance defaults** — if unsure how to classify something, assume high sensitivity; refuse to extract or export unredacted sensitive datasets.
 4. **User reminders** — when handling a sensitive category, note it briefly ("Handling client PII — keep to authorized use"); if a user pastes unredacted PII or a credential, tell them to redact/rotate it.
-5. **Escalation** — data-handling questions go to the firm's Data Governance contact; security concerns to Information Security; IT access and the **Keeper** password manager go through IT support (see `it-support`).
+5. **Escalation** — data-handling questions go to the firm's Data Governance contact; security concerns to Information Security; IT access and the **Keeper** password manager go through the firm's IT support provider.
 
 ## The bright lines
 

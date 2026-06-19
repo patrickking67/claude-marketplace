@@ -1,13 +1,22 @@
 ---
-name: draft-time-entries
-description: The main Timekeeper workflow — reconstruct billable time from Microsoft 365 through a guided interview. Use whenever someone says "log my time," "bill my week," "draft time entries," "reconstruct my hours," "what should I bill," "I forgot to track my time," "turn my email and calendar into time entries," or names a timekeeper and a date range for billing. Runs interactively — it asks who and what dates, confirms, mines Outlook/Teams/calendar, shows reviewable cards, and writes an import-ready CSV. Never auto-bills — every entry is a draft for human review.
+name: time-entry
+description: The main Timekeeper workflow — reconstruct billable time from Microsoft 365. Use whenever someone says "log my time," "bill my week," "draft time entries," "reconstruct my hours," "what should I bill," "I forgot to track my time," "turn my email and calendar into time entries," or names a timekeeper and a date range for billing. A short window (a day or two) takes a fast inline path; a week, a month, or several/all timekeepers take the full multi-agent sweep. Runs interactively — confirms who and what dates, mines Outlook/Teams/calendar, shows reviewable cards, and writes an import-ready CSV. Never auto-bills — every entry is a draft for human review.
 ---
 
-# Draft time entries
+# Time entry
 
-Reconstruct a timekeeper's billable day from Microsoft 365 and produce review-ready entries in the firm's format. This is an **interactive** workflow: interview first, confirm, then work. Accuracy and defensibility beat speed — every entry has to survive a court fee-audit, so when in doubt, flag rather than guess.
+Reconstruct a timekeeper's billable time from Microsoft 365 and produce review-ready entries in the firm's format. This is an **interactive** workflow: confirm first, then work. Accuracy and defensibility beat speed — every entry has to survive a court fee-audit, so when in doubt, flag rather than guess.
 
 Read these before drafting: `${CLAUDE_PLUGIN_ROOT}/references/m365-mining.md`, `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md`, `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`. Apply the working folder's `learned-mappings.md` if it exists.
+
+## Pick the path — a short window goes fast
+
+Size the range before anything else:
+
+- **Fast path** — a single day or two ("yesterday," "today," one date). Skip the full interview and the Opus sweep: default the timekeeper to the connected M365 user (confirm in one line), mine that Pacific-day's Outlook sent/received, Teams, and calendar **inline**, draft **inline**, and go straight to review. A day is small enough that spinning up the heavy multi-source agent isn't worth the latency.
+- **Full path** — a week, a month, or several/all timekeepers. Run the full workflow below: interview → confirm → delegate discovery to `activity-miner` (Opus) → draft via `entry-drafter` (Sonnet).
+
+Either way, **Steps 5–7 (review → CSV → Clio hand-off) and every guardrail are identical.** Speed never skips the human review.
 
 ## Step 1 — Interview (don't skip)
 
@@ -25,13 +34,17 @@ If the user already gave a concrete range in their message, skip straight to con
 
 Read back the resolved parameters in one line ("Drafting Sarah's time, 2026-03-02→03-06, all matters, excluding internal standups, CSV only — go?") and wait for a yes. This is the cheap moment to catch a wrong name or window.
 
-## Step 3 — Discover (delegate to `activity-miner`, Opus)
+## Step 3 — Discover
 
-Hand the timekeeper + range + scope to the **activity-miner** agent. It sweeps Outlook sent/received, Teams, calendar, and SharePoint and returns cited candidates with matter guesses, duration estimates, and confidence. Don't do this sweep inline — the agent is tuned for it and runs on Opus for the hard mapping calls.
+**Full path** — hand the timekeeper + range + scope to the **activity-miner** agent (Opus). It sweeps Outlook sent/received, Teams, calendar, and SharePoint and returns cited candidates with matter guesses, duration estimates, and confidence. Don't do this sweep inline — the agent is tuned for it and runs on Opus for the hard mapping calls.
 
-## Step 4 — Draft (delegate to `entry-drafter`, Sonnet)
+**Fast path** (a day or two) — skip the agent and mine inline: read that Pacific-day's sent/received mail, Teams messages, and calendar yourself and form the same cited candidates. Same sources, same citation discipline — just no hand-off.
 
-Pass the candidates to the **entry-drafter** agent to set the exact matter and the exact `user × matter` rate from `${CLAUDE_PLUGIN_ROOT}/references/rate-card.csv` (never a guessed number), write **present-tense** descriptions in the firm voice (`${CLAUDE_PLUGIN_ROOT}/references/billing-style.md`), round up to tenths, and emit rows in the exact CSV schema plus a flag list.
+## Step 4 — Draft
+
+**Full path** — pass the candidates to the **entry-drafter** agent (Sonnet) to set the exact matter and the exact `user × matter` rate from `${CLAUDE_PLUGIN_ROOT}/references/rate-card.csv` (never a guessed number), write **present-tense** descriptions in the firm voice (`${CLAUDE_PLUGIN_ROOT}/references/billing-style.md`), round up to tenths, and emit rows in the exact CSV schema plus a flag list.
+
+**Fast path** — draft inline using the same rate lookup, voice rules, and tenths rounding. The output and flags are identical; you're just not delegating.
 
 ## Step 5 — Review (cards or table)
 
@@ -58,7 +71,7 @@ End by putting the import file in their hands **and** pointing them straight at 
    - **User:** the timekeeper (or leave blank if `activity_user` is filled per row). **File:** the CSV above → **Upload** → review Clio's preview → import. Matters must already exist in Clio, spelled exactly.
 3. Then offer: adjust & re-render, run `billing` for a QA/reconcile pass, produce the **workbook/memo**, or `publish` to SharePoint (`Billing Drafts/<year>/<month>/`, see `${CLAUDE_PLUGIN_ROOT}/references/output-style.md`).
 
-Close with **ready to import into Clio**, the CSV, and the import link. When the remote **Clio Manage** connector is live, this step posts the activities directly instead of a manual import.
+Close with **ready to import into Clio**, the CSV, and the import link. When the native **Clio** connector is live, this step posts the activities directly instead of a manual import.
 
 ## Guardrails
 

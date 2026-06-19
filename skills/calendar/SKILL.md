@@ -11,7 +11,7 @@ Read the M365 calendar and turn it into something useful — a look-ahead, prep,
 
 - **Look ahead** — what's on today / this week, who's attending, where, and what needs preparation (hearings, deal calls, client meetings).
 - **Surface deadlines** — court dates, filing deadlines, and recurring obligations; flag anything close.
-- **Feed billing** — past meetings, calls, and hearings are billable events with a real duration. When the user is reconstructing time, hand these to `draft-time-entries` / `activity-miner` so meeting time is captured accurately and mapped to the right matter.
+- **Feed billing** — past meetings, calls, and hearings are billable events with a real duration. When the user is reconstructing time, hand these to `time-entry` / `activity-miner` so meeting time is captured accurately and mapped to the right matter.
 
 ## Notes
 
