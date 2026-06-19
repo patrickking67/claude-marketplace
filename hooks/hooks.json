@@ -1,0 +1,17 @@
+{
+  "description": "Timekeeper access gate — restricts Timekeeper to allowlisted Microsoft 365 users (advisory; see hooks/allowed-users.txt and INSTALL.md).",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/allowlist-gate.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

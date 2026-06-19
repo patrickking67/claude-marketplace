@@ -17,7 +17,7 @@ Turn one natural-language question into parallel searches across every available
 
 ## Notes
 
-- Read-only. Describe what you find; for privileged material, describe the *work*, not the substance (see `billing-best-practices`).
+- Read-only. Describe what you find; for privileged material, describe the *work*, not the substance (see `billing-rules`).
 - If a source is unavailable, note the gap and answer from the rest — don't let one failure block the search.
 - If nothing matches, suggest broader terms or a wider date range rather than returning empty.
-- This complements `draft-time-entries` (which mines for billable activity) — `search` answers a question; drafting reconstructs a billable day.
+- This complements `time-entry` (which mines for billable activity) — `search` answers a question; drafting reconstructs a billable day.

@@ -5,7 +5,7 @@ description: Find and confirm the right matter for a piece of work from the firm
 
 # Matters
 
-Get the matter right — a misposted matter is a misbilled client. The **rate model and mapping rules** live in `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`; the **current matter list** comes from the firm's Clio matters export (provided at run time) or the working folder's `learned-mappings.md` (apply confirmed overrides first).
+Get the matter right — a misposted matter is a misbilled client. The **rate model and mapping rules** live in `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`; the **current matter list** is bundled at `${CLAUDE_PLUGIN_ROOT}/references/matters.csv` (a Clio matters export — number, name, caption, status, dates, responsible attorney, case no., property). Prefer a fresher export if the firm provides one at run time, and apply the working folder's `learned-mappings.md` overrides first. See `${CLAUDE_PLUGIN_ROOT}/references/clio-exports.md` for the full export map.
 
 ## Use it to
 

@@ -5,7 +5,7 @@ description: The firm's billing workflow — QA drafted time entries, reconcile 
 
 # Billing
 
-Everything between "drafted" and "billed." A bad import is painful to unwind and a misposted or duplicated entry becomes a client fee-objection, so this skill is the gate. Reference `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md` and `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`; honor `learned-mappings.md`.
+Everything between "drafted" and "billed." A bad import is painful to unwind and a misposted or duplicated entry becomes a client fee-objection, so this skill is the gate. Reference `${CLAUDE_PLUGIN_ROOT}/references/billing-format.md` and `${CLAUDE_PLUGIN_ROOT}/references/matters-and-rates.md`; honor `learned-mappings.md`. The Clio reports that feed QA and reconciliation (billing history, AR aging, client productivity) are mapped in `${CLAUDE_PLUGIN_ROOT}/references/clio-exports.md`.
 
 ## Modes (pick from the request)
 
@@ -15,7 +15,7 @@ Everything between "drafted" and "billed." A bad import is painful to unwind and
 
 **Find unbilled time** — run `activity-miner` over the period, diff against a billed export or prior draft, and report the gaps with confidence and a `rate × hours` dollar estimate. Lead with total recoverable dollars — that's the headline. Without a baseline you can only list activity, not find gaps, so ask for one.
 
-**Month-end cycle** — orchestrate across timekeepers with approval gates: draft each (via `draft-time-entries`) → ⛔ review → audit the combined set (incl. cross-timekeeper duplicates) → reconcile/gap-check → ⛔ approve → publish + a short memo with totals by matter and timekeeper. The gates are the feature; never collapse them.
+**Month-end cycle** — orchestrate across timekeepers with approval gates: draft each (via `time-entry`) → ⛔ review → audit the combined set (incl. cross-timekeeper duplicates) → reconcile/gap-check → ⛔ approve → publish + a short memo with totals by matter and timekeeper. The gates are the feature; never collapse them.
 
 **Publish** — only publish reviewed entries. Produce the deliverable set per `${CLAUDE_PLUGIN_ROOT}/references/output-style.md` — CSV (import) + the **billing workbook** (`.xlsx`), plus a period **memo** at month-end — and publish to the `automation` SharePoint site at `Billing Drafts/<YYYY>/<MM - Month>/` (reconciliations and gap analyses go to `Reports/`) via a write-capable Microsoft connector, or save locally and report the path if none is connected. Never overwrite source data, the firm's originals, or an existing draft (version with `_vN`).
 

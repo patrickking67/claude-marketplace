@@ -1,11 +1,10 @@
 {
   "name": "timekeeper",
   "displayName": "Timekeeper",
-  "version": "2.0.0",
-  "description": "Built by DivergeIT for FedReceiver / Jalmar Properties — a Microsoft 365-native legal practice assistant for fiduciary/receivership firms. Timekeeper adaptively reconstructs billable time (one, several, or all timekeepers) from Outlook, Teams, and calendar; sets exact per-matter rates from an authoritative rate card; drafts court-defensible, present-tense entries in the firm's exact format; produces polished billing workbooks and sign-off memos; and helps with matters, contacts, calendar, enterprise search, document parsing, and billing review. It exports an import-ready CSV for Clio Manage and can publish reviewed output to the firm's SharePoint site. Every entry is human-reviewed before it's billed. Works in Claude.ai, Claude Cowork, and Claude Code. Use it to log or reconstruct time, build a billing workbook, find unbilled work, review or reconcile billing, look up a matter or contact, search Microsoft 365, parse invoices or contracts, or get IT support.",
+  "version": "2.1.0",
+  "description": "Built by DivergeIT for FedReceiver / Jalmar Properties — a Microsoft 365-native legal practice assistant for fiduciary/receivership firms. Timekeeper adaptively reconstructs billable time (one, several, or all timekeepers) from Outlook, Teams, and calendar; sets exact per-matter rates from an authoritative rate card; drafts court-defensible, present-tense entries in the firm's exact format; produces polished billing workbooks and sign-off memos; and helps with matters, contacts, calendar, enterprise search, document parsing, and billing review. It exports an import-ready CSV for Clio Manage and can publish reviewed output to the firm's SharePoint site. Every entry is human-reviewed before it's billed. Works in Claude.ai, Claude Cowork, and Claude Code. Use it to log or reconstruct time, build a billing workbook, find unbilled work, review or reconcile billing, look up a matter or contact, search Microsoft 365, or parse invoices or contracts.",
   "author": {
-    "name": "DivergeIT",
-    "url": "https://divergeit.com"
+    "name": "Patrick King"
   },
   "license": "MIT",
   "keywords": [

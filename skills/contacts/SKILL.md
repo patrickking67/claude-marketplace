@@ -5,7 +5,7 @@ description: Look up and organize the firm's contacts — clients, opposing and 
 
 # Contacts
 
-Answer "who is this" and keep the firm's people organized, working from the contact export the user provides and Microsoft 365 (Outlook contacts, message participants). No Clio connection — use the data on hand.
+Answer "who is this" and keep the firm's people organized, working from the bundled contacts export at `${CLAUDE_PLUGIN_ROOT}/data/sample-contacts.csv` (clients, counsel, vendors, service-list members), any fresher export the user provides, and Microsoft 365 (Outlook contacts, message participants). No live Clio connection yet — use the data on hand.
 
 ## Use it to
 
@@ -16,5 +16,5 @@ Answer "who is this" and keep the firm's people organized, working from the cont
 ## Rules
 
 - Distinguish **clients/matters** from **non-client contacts** (outside counsel like Riley|Ersoff or Martinez & Schill, insurers like Mercury, vendors). Only clients map to billable matters.
-- Treat contact details as sensitive PII — see `billing-best-practices` for handling. Don't export unredacted contact lists without a clear, authorized reason.
+- Treat contact details as sensitive PII — see `billing-rules` for handling. Don't export unredacted contact lists without a clear, authorized reason.
 - When the export and M365 disagree, surface the conflict rather than silently picking one.

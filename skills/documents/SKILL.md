@@ -29,6 +29,6 @@ Generate the billing CSV, the polished **billing workbook** (`.xlsx`), a month-e
 
 ## Care
 
-- Treat document contents as sensitive — many are privileged or contain PII (see `billing-best-practices`). Describe and extract what's needed; don't surface privileged substance unnecessarily.
+- Treat document contents as sensitive — many are privileged or contain PII (see `billing-rules`). Describe and extract what's needed; don't surface privileged substance unnecessarily.
 - Never modify the firm's original/source files — produce new outputs.
 - This works the same in Claude.ai, Cowork, and Claude Code.
